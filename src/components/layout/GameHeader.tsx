@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Play, Pause, Square, Settings2, User as UserIcon, Bell, BellOff } from 'lucide-react';
+import { Play, Pause, Square, Settings2, User as UserIcon, Bell, BellOff, Megaphone, Mic, MicOff } from 'lucide-react';
 import { GameSession, GameMode } from '../../types/bingo';
 
 interface GameHeaderProps {
@@ -14,7 +14,11 @@ interface GameHeaderProps {
   user: { id: string; name: string; avatarUrl?: string | null } | null;
   participantsCount: number;
   isPushEnabled: boolean;
+  isMuted: boolean;
+  isMicActive: boolean;
   onSubscribe: () => void;
+  onToggleMute: () => void;
+  onToggleMic: () => void;
   onTogglePause: () => void;
   onFinishGame: () => void;
   onStartRequest: () => void;
@@ -33,7 +37,11 @@ export default function GameHeader({
   user,
   participantsCount,
   isPushEnabled,
+  isMuted,
+  isMicActive,
   onSubscribe,
+  onToggleMute,
+  onToggleMic,
   onTogglePause,
   onFinishGame,
   onStartRequest,
@@ -49,6 +57,14 @@ export default function GameHeader({
       style={{ paddingTop: 'calc(5.5rem + env(safe-area-inset-top))' }}
     >
       <div className="flex items-center space-x-1.5">
+        <button 
+          onClick={onToggleMute}
+          className={`p-1 rounded-lg transition-all active:scale-90 ${isMuted ? 'text-slate-300' : 'text-blue-600 bg-blue-50 shadow-sm'}`}
+          title={isMuted ? "Sonido desactivado" : "Sonido activado"}
+        >
+          <Megaphone className={`w-4 h-4 ${!isMuted && 'animate-pulse'}`} />
+        </button>
+
         <img 
           src="/icon.png" 
           alt="Logo" 
@@ -74,17 +90,31 @@ export default function GameHeader({
       
       <div className="flex items-center gap-2">
         {user && (
-          <button 
-            onClick={onSubscribe}
-            className={`p-1.5 rounded-xl transition-all active:scale-95 shadow-sm border flex items-center justify-center ${
-              isPushEnabled 
-                ? 'bg-blue-50 text-blue-600 border-blue-100 hover:bg-blue-100' 
-                : 'bg-white text-slate-400 border-slate-100 hover:bg-slate-50'
-            }`}
-            title={isPushEnabled ? "Notificaciones activas" : "Activar notificaciones"}
-          >
-            {isPushEnabled ? <Bell className="w-3.5 h-3.5 fill-current" /> : <BellOff className="w-3.5 h-3.5" />}
-          </button>
+          <>
+            <button 
+              onClick={onToggleMic}
+              className={`p-1.5 rounded-xl transition-all active:scale-95 shadow-sm border flex items-center justify-center ${
+                isMicActive 
+                  ? 'bg-red-50 text-red-600 border-red-100 animate-pulse' 
+                  : 'bg-white text-slate-400 border-slate-100'
+              }`}
+              title={isMicActive ? "Micrófono encendido" : "Encender micrófono"}
+            >
+              {isMicActive ? <Mic className="w-3.5 h-3.5" /> : <MicOff className="w-3.5 h-3.5" />}
+            </button>
+
+            <button 
+              onClick={onSubscribe}
+              className={`p-1.5 rounded-xl transition-all active:scale-95 shadow-sm border flex items-center justify-center ${
+                isPushEnabled 
+                  ? 'bg-blue-50 text-blue-600 border-blue-100 hover:bg-blue-100' 
+                  : 'bg-white text-slate-400 border-slate-100 hover:bg-slate-50'
+              }`}
+              title={isPushEnabled ? "Notificaciones activas" : "Activar notificaciones"}
+            >
+              {isPushEnabled ? <Bell className="w-3.5 h-3.5 fill-current" /> : <BellOff className="w-3.5 h-3.5" />}
+            </button>
+          </>
         )}
 
         {!user ? (

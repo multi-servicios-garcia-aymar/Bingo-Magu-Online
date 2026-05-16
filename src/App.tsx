@@ -74,6 +74,8 @@ export default function App() {
   
   const { isEnabled: isPushEnabled, subscribe: handleSubscribePush } = useNotifications(user?.id);
 
+  const [isMuted, setIsMuted] = useState(false);
+  const [isMicActive, setIsMicActive] = useState(false);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [cardCount, setCardCount] = useState(1);
   const [error, setError] = useState<string | null>(null);
@@ -102,20 +104,63 @@ export default function App() {
   // Audio/Haptic on draw
   useEffect(() => {
     if (game?.current_number) {
-      GameAudio.ballDraw();
-      playSound('DRAW');
+      if (!isMuted) {
+        GameAudio.ballDraw();
+        playSound('DRAW');
+      }
       hapticFeedback.impact('medium');
       
       // Voice Synthesis
-      if ('speechSynthesis' in window) {
+      if ('speechSynthesis' in window && !isMuted) {
         const letter = BINGO_CONFIG.getLetter(game.current_number, game.ball_limit);
         const utterance = new SpeechSynthesisUtterance(`${letter}, ${game.current_number}`);
         utterance.lang = 'es-ES';
-        utterance.rate = 0.9;
+        utterance.rate = 1.0;
         window.speechSynthesis.speak(utterance);
       }
     }
-  }, [game?.current_number, game?.ball_limit]);
+  }, [game?.current_number, game?.ball_limit, isMuted]);
+
+  // Voice Command (Microphone) Logic
+  useEffect(() => {
+    if (!isMicActive) return;
+
+    // @ts-ignore
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      setError('Tu navegador no soporta reconocimiento de voz.');
+      setIsMicActive(false);
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'es-ES';
+    recognition.continuous = true;
+    recognition.interimResults = false;
+
+    recognition.onresult = (event: any) => {
+      const last = event.results.length - 1;
+      const text = event.results[last][0].transcript.toLowerCase();
+      
+      if (text.includes('bingo')) {
+        const currentCard = userCards[currentCardIndex];
+        if (currentCard) {
+          handleBingo(currentCard.marked_keys || []);
+        }
+      }
+    };
+
+    recognition.onerror = (event: any) => {
+      console.error('Speech recognition error', event.error);
+      if (event.error === 'not-allowed') {
+        setError('Permiso de micrófono denegado.');
+        setIsMicActive(false);
+      }
+    };
+
+    recognition.start();
+    return () => recognition.stop();
+  }, [isMicActive, userCards, currentCardIndex]);
 
   // Auto-draw logic: Synchronized with Server
   useEffect(() => {
@@ -388,7 +433,11 @@ export default function App() {
               user={user}
               participantsCount={participantsCount}
               isPushEnabled={isPushEnabled}
+              isMuted={isMuted}
+              isMicActive={isMicActive}
               onSubscribe={handleSubscribePush}
+              onToggleMute={() => { setIsMuted(!isMuted); hapticFeedback.selection(); }}
+              onToggleMic={() => { setIsMicActive(!isMicActive); hapticFeedback.selection(); }}
               onTogglePause={handleTogglePause}
               onFinishGame={handleFinishGame}
               onStartRequest={handleStartRequest}
