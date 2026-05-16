@@ -1,0 +1,9 @@
+{
+  "name": "Bingo Magu Online",
+  "description": "Plataforma de Bingo Multijugador Online optimizada para Telegram y Web, con integración de Supabase y publicidad dirigida.",
+  "requestFramePermissions": [
+    "microphone",
+    "notifications"
+  ],
+  "majorCapabilities": []
+}
