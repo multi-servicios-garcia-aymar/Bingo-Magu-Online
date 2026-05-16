@@ -420,7 +420,7 @@ export default function App() {
         </div>
       )}
 
-      <div className="w-full max-w-2xl h-full flex flex-col bg-white shadow-2xl relative overflow-hidden">
+      <div className="w-full max-w-2xl lg:max-w-6xl h-full flex flex-col bg-white shadow-2xl relative overflow-hidden">
         {view === 'lobby' ? (
           <GameLobby onSelectMode={handleModeSelect} />
         ) : (
@@ -448,14 +448,6 @@ export default function App() {
               onShowSettings={() => setShowSettings(true)}
             />
 
-            {/* Debug/Dev alerts - hide in professional view */}
-            {/* !IS_SUPABASE_CONFIGURED && (
-              <div className="bg-amber-100 border-b border-amber-200 p-2 flex items-center gap-2 animate-pulse">
-                <AlertCircle className="w-4 h-4 text-amber-600" />
-                <span className="text-[10px] font-black uppercase italic">⚠️ Falta Configuración de Base de Datos</span>
-              </div>
-            ) */}
-
             {(error || gameError) && (
               <div className="bg-red-50 border-b border-red-100 p-2 flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -466,7 +458,7 @@ export default function App() {
               </div>
             )}
 
-            <main className="flex-1 overflow-hidden flex flex-col p-1 space-y-0.5 relative">
+            <main className="flex-1 overflow-hidden flex flex-col lg:flex-row p-1 space-y-0.5 lg:space-y-0 lg:gap-4 relative">
               {loading ? (
                 <div className="flex-1 flex items-center justify-center">
                   <div className="flex flex-col items-center gap-3">
@@ -490,32 +482,36 @@ export default function App() {
                     )}
                   </AnimatePresence>
 
-                  <div className="shrink-0">
-                    <GameStateInfo 
-                      game={game as any} 
-                      timeLeft={timeLeft} 
-                      winningPattern={winPattern} 
-                    />
-                  </div>
-                  
-                  <div className="shrink-0 bg-white/40 p-0.5 rounded-lg shadow-inner border border-white/40 relative group overflow-hidden">
-                     {!user && game && (
-                       <div 
-                         onClick={() => setShowAuthModal(true)}
-                         className="absolute inset-0 bg-blue-600/5 backdrop-blur-[1px] z-10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-                       >
-                         <div className="bg-white/90 px-3 py-1.5 rounded-full shadow-lg border border-blue-100 flex items-center gap-2">
-                           <Play className="w-3 h-3 text-blue-600 fill-current" />
-                           <span className="text-[10px] font-black uppercase italic text-blue-700">Iniciar Sesión para Jugar</span>
+                  {/* Left Column (Board) */}
+                  <div className="shrink-0 lg:w-[45%] flex flex-col space-y-0.5">
+                    <div className="shrink-0">
+                      <GameStateInfo 
+                        game={game as any} 
+                        timeLeft={timeLeft} 
+                        winningPattern={winPattern} 
+                      />
+                    </div>
+                    
+                    <div className="shrink-0 bg-white/40 p-0.5 rounded-lg shadow-inner border border-white/40 relative group overflow-hidden">
+                       {!user && game && (
+                         <div 
+                           onClick={() => setShowAuthModal(true)}
+                           className="absolute inset-0 bg-blue-600/5 backdrop-blur-[1px] z-10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                         >
+                           <div className="bg-white/90 px-3 py-1.5 rounded-full shadow-lg border border-blue-100 flex items-center gap-2">
+                             <Play className="w-3 h-3 text-blue-600 fill-current" />
+                             <span className="text-[10px] font-black uppercase italic text-blue-700">Iniciar Sesión para Jugar</span>
+                           </div>
                          </div>
+                       )}
+                       <BingoBoard drawnNumbers={game?.drawn_numbers || []} ballLimit={game?.ball_limit || 75} />
+                       <div className="h-4 overflow-hidden mt-0.5">
+                         <HistoryRail drawnNumbers={game?.drawn_numbers || []} />
                        </div>
-                     )}
-                     <BingoBoard drawnNumbers={game?.drawn_numbers || []} ballLimit={game?.ball_limit || 75} />
-                     <div className="h-4 overflow-hidden mt-0.5">
-                       <HistoryRail drawnNumbers={game?.drawn_numbers || []} />
-                     </div>
+                    </div>
                   </div>
 
+                  {/* Right Column (Cards) */}
                   <div className="flex-1 flex flex-col min-h-0 relative">
                     {userCards.length > 0 ? (
                        <>
