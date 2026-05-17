@@ -565,10 +565,24 @@ export default function App() {
                          </div>
 
                          {game?.status === 'waiting' && userCards.length < 5 && (
-                           <div className="mt-1 px-4 shrink-0 pb-1">
+                           <div className="mt-1 px-4 shrink-0 pb-1 space-y-2">
+                             <div className="flex items-center justify-between bg-blue-50/50 p-1.5 rounded-xl border border-blue-100/30">
+                               <span className="text-[8px] font-black text-slate-500 uppercase italic">Añadir más:</span>
+                               <div className="flex items-center gap-1">
+                                 {Array.from({ length: 5 - userCards.length }, (_, i) => i + 1).map(num => (
+                                   <button
+                                     key={num}
+                                     onClick={() => { setCardCount(num); hapticFeedback.selection(); }}
+                                     className={`w-7 h-7 rounded-lg font-black text-[10px] transition-all border ${cardCount === num ? 'bg-blue-600 text-white border-blue-600 shadow-md shadow-blue-200' : 'bg-white text-slate-500 border-slate-100 hover:bg-slate-50'}`}
+                                   >
+                                     {num}
+                                   </button>
+                                 ))}
+                               </div>
+                             </div>
                              <button onClick={handleJoin} className="w-full text-[8px] font-black text-blue-600 uppercase italic flex items-center justify-center gap-1 bg-blue-50 py-1.5 rounded-lg border border-blue-200 shadow-sm active:scale-95 transition-all">
                                <Grid3X3 className="w-3 h-3" />
-                               Añadir tabla
+                               Generar {cardCount} {cardCount === 1 ? 'tabla' : 'tablas'} adicional{cardCount === 1 ? '' : 'es'}
                              </button>
                            </div>
                          )}
@@ -619,7 +633,7 @@ export default function App() {
                                 <div className="flex items-center justify-between">
                                   <span className="text-[9px] font-black text-slate-500 uppercase italic">Cant. Tablas</span>
                                   <div className="flex items-center gap-2">
-                                     {[1, 2, 3, 4].map(num => (
+                                     {[1, 2, 3, 4, 5].map(num => (
                                        <button
                                          key={num}
                                          onClick={() => { setCardCount(num); hapticFeedback.selection(); }}
