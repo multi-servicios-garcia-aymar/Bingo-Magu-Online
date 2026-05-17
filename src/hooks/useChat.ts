@@ -48,7 +48,7 @@ export function useChat(gameId: string | undefined) {
     };
   }, [gameId]);
 
-  const sendMessage = async (userId: string, userName: string, message: string) => {
+  const sendMessage = async (userId: string, userName: string, message: string, type: 'text' | 'system' | 'reaction' = 'text', metadata: any = null) => {
     if (!gameId || !message.trim()) return;
 
     const { error } = await supabase.from('game_chat').insert({
@@ -56,6 +56,8 @@ export function useChat(gameId: string | undefined) {
       user_id: userId,
       user_name: userName,
       message: message.trim(),
+      type: type,
+      metadata: metadata,
     });
 
     if (error) {

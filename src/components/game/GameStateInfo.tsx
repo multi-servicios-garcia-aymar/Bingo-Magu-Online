@@ -47,7 +47,7 @@ export default function GameStateInfo({ game, timeLeft, winningPattern }: GameSt
   return (
     <div className="flex flex-col mb-1 shrink-0 overflow-hidden rounded-xl border border-slate-100 shadow-lg mx-1">
       {/* Top Main Status Bar */}
-      <div className="grid grid-cols-3 items-center bg-white/95 backdrop-blur-md px-2 py-1 relative z-10">
+      <div className="grid grid-cols-3 items-center bg-white/95 backdrop-blur-md px-2 py-0.5 relative z-10">
         {/* Left: Next Ball */}
         <div className="flex items-center gap-2">
           <div className="relative">
@@ -113,7 +113,7 @@ export default function GameStateInfo({ game, timeLeft, winningPattern }: GameSt
 
       {/* Integrated Pattern Banner - Slimmed down */}
       {winningPattern.description && game && (
-        <div className="bg-blue-600 text-white px-2 py-1.5 flex items-center gap-2 overflow-hidden relative group border-t border-blue-500/30">
+        <div className="bg-blue-600 text-white px-2 py-1 flex items-center gap-2 overflow-hidden relative group border-t border-blue-500/30">
           <div className="absolute -top-1 -right-1 p-2 opacity-10 rotate-12">
              <Star className="w-10 h-10 fill-current" />
           </div>

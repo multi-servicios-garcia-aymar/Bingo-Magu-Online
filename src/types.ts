@@ -42,4 +42,6 @@ export interface ChatMessage {
   user_name: string;
   message: string;
   created_at: string;
+  type?: 'text' | 'system' | 'reaction';
+  metadata?: any;
 }

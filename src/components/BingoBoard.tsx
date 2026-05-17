@@ -36,7 +36,7 @@ export default function BingoBoard({ drawnNumbers, ballLimit }: BingoBoardProps)
         </span>
       </div>
 
-      <div className="flex flex-col gap-0.5">
+      <div className="flex flex-col gap-[1px]">
         {BINGO_CONFIG.COLUMNS.map((colName) => {
           const [min, max] = columns[colName];
           const numbers = Array.from({ length: max - min + 1 }, (_, i) => min + i);

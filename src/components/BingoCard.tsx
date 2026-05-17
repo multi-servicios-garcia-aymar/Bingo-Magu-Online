@@ -62,8 +62,8 @@ export default function BingoCard({
   const isDrawn = (val: number) => val === 0 || drawnNumbers.includes(val);
   
   return (
-    <div className="flex flex-col items-center space-y-1 w-full max-w-[320px] sm:max-w-md mx-auto py-2 px-1 justify-center relative">
-      <div className={`bg-white p-2 sm:p-4 rounded-[1.5rem] sm:rounded-[2.5rem] shadow-2xl border border-slate-100 w-full relative transition-all duration-700 shrink-0 ${isWinner ? 'winner-glow scale-105 ring-4 ring-green-400/30' : ''}`}>
+    <div className="flex flex-col items-center space-y-0.5 w-full max-w-[320px] sm:max-w-md mx-auto py-1 px-1 justify-center relative">
+      <div className={`bg-white p-1.5 sm:p-4 rounded-[1.2rem] sm:rounded-[2.5rem] shadow-2xl border border-slate-100 w-full relative transition-all duration-700 shrink-0 ${isWinner ? 'winner-glow scale-105 ring-4 ring-green-400/30' : ''}`}>
         
         {/* Destello / Flash Effect */}
         <AnimatePresence>
@@ -92,7 +92,7 @@ export default function BingoCard({
           )}
         </AnimatePresence>
         
-        <div className="grid grid-cols-5 gap-1 sm:gap-2.5 mb-1.5 sm:mb-2 md:mb-3">
+        <div className="grid grid-cols-5 gap-1 sm:gap-2.5 mb-1 sm:mb-2 md:mb-3">
           {['B', 'I', 'N', 'G', 'O'].map((letter) => (
             <div key={letter} className="text-center font-black text-xs sm:text-2xl md:text-3xl text-blue-600 italic font-display flex items-center justify-center">
               {letter}
@@ -146,7 +146,7 @@ export default function BingoCard({
         </div>
       </div>
 
-      <div className="w-full flex flex-col gap-1 sm:gap-2 shrink-0 min-h-[40px] sm:min-h-[60px] justify-center">
+      <div className="w-full flex flex-col gap-0.5 sm:gap-2 shrink-0 min-h-[36px] sm:min-h-[60px] justify-center">
         <AnimatePresence mode="wait">
           {isWinner ? (
             <motion.div 
@@ -154,9 +154,9 @@ export default function BingoCard({
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
-              className="bg-green-600 text-white py-2 rounded-xl text-center font-black w-full text-xs flex items-center justify-center gap-2 shadow-lg border border-white/30 italic uppercase"
+              className="bg-green-600 text-white py-1 rounded-xl text-center font-black w-full text-[10px] flex items-center justify-center gap-2 shadow-lg border border-white/30 italic uppercase"
             >
-              <Sparkles className="w-4 h-4 animate-pulse" />
+              <Sparkles className="w-3 h-3 animate-pulse" />
               ¡GANASTE BINGO!
             </motion.div>
           ) : (

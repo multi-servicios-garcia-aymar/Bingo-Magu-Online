@@ -19,6 +19,7 @@ import { useParticipant } from './hooks/useParticipant';
 import { useBingoAuth } from './hooks/useBingoAuth';
 import { useAds } from './hooks/useAds';
 import { useNotifications } from './hooks/useNotifications';
+import { useChat } from './hooks/useChat';
 
 // Services
 import { GameService } from './services/gameService';
@@ -73,6 +74,7 @@ export default function App() {
   const { activePopupAd, setActivePopupAd, sidebarAds } = useAds(gameMode, game?.status, game?.drawn_numbers?.length || 0, true);
   
   const { isEnabled: isPushEnabled, subscribe: handleSubscribePush } = useNotifications(user?.id);
+  const { sendMessage } = useChat(game?.id);
 
   const [isMuted, setIsMuted] = useState(false);
   const [isMicActive, setIsMicActive] = useState(false);
@@ -205,6 +207,11 @@ export default function App() {
       GameAudio.bingoSuccess();
       playSound('VICTORY');
       hapticFeedback.notification('success');
+      
+      // Announcement in chat
+      if (user) {
+        sendMessage('system', 'Bingo!', `¡${user.name} ha cantado BINGO! 🎉`, 'system');
+      }
     } catch (e: any) { 
       playSound('ERROR');
       setError(e.message); 
@@ -260,6 +267,9 @@ export default function App() {
       
       setCardCount(1);
       if (view === 'lobby') setView('game');
+      
+      // Announcement
+      sendMessage('system', 'Bingo!', `¡${user.name} se ha unido con ${cardCount} ${cardCount === 1 ? 'tabla' : 'tablas'}! 👋`, 'system');
       
       // @ts-ignore
       window.Telegram?.WebApp?.MainButton?.hide();
@@ -378,6 +388,7 @@ export default function App() {
     if (gameMode === 'global' && !isSuperAdmin) return;
     
     await GameService.startSession(game.id);
+    sendMessage('system', 'Bingo!', '¡La partida ha comenzado! ¡Mucha suerte a todos! 🎱🎉', 'system');
   };
 
   const handleConfirmConfig = async (config: any) => {
@@ -458,7 +469,7 @@ export default function App() {
               </div>
             )}
 
-            <main className="flex-1 overflow-hidden flex flex-col lg:flex-row p-1 space-y-0.5 lg:space-y-0 lg:gap-4 relative">
+            <main className="flex-1 overflow-y-auto flex flex-col lg:flex-row p-1 space-y-0.5 lg:space-y-0 lg:gap-4 relative custom-scrollbar">
               {loading ? (
                 <div className="flex-1 flex items-center justify-center">
                   <div className="flex flex-col items-center gap-3">
@@ -540,14 +551,14 @@ export default function App() {
                             </button>
                          </div>
 
-                         <div className="flex-none flex items-center justify-center p-2 mb-4">
+                         <div className="flex-none flex items-center justify-center p-1 mb-1">
                            <AnimatePresence mode="wait">
                              <motion.div
                                 key={userCards[currentCardIndex].id}
                                 initial={{ opacity: 0, scale: 0.9 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 exit={{ opacity: 0, scale: 0.9 }}
-                                className="w-full flex items-center justify-center py-4"
+                                className="w-full flex items-center justify-center py-1"
                              >
                                <BingoCard 
                                   card={userCards[currentCardIndex].card_data}
