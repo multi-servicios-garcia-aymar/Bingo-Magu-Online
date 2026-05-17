@@ -62,8 +62,8 @@ export default function BingoCard({
   const isDrawn = (val: number) => val === 0 || drawnNumbers.includes(val);
   
   return (
-    <div className="flex flex-col items-center space-y-0.5 w-full max-w-[280px] sm:max-w-md mx-auto h-full max-h-full overflow-hidden px-0.5 justify-center relative">
-      <div className={`bg-white p-1 sm:p-3 rounded-[1rem] sm:rounded-[2.5rem] shadow-xl border border-slate-100 w-full relative transition-all duration-700 shrink-0 ${isWinner ? 'winner-glow scale-105 ring-4 ring-green-400/30' : ''}`}>
+    <div className="flex flex-col items-center space-y-1 w-full max-w-[320px] sm:max-w-md mx-auto py-2 px-1 justify-center relative">
+      <div className={`bg-white p-2 sm:p-4 rounded-[1.5rem] sm:rounded-[2.5rem] shadow-2xl border border-slate-100 w-full relative transition-all duration-700 shrink-0 ${isWinner ? 'winner-glow scale-105 ring-4 ring-green-400/30' : ''}`}>
         
         {/* Destello / Flash Effect */}
         <AnimatePresence>
@@ -92,10 +92,9 @@ export default function BingoCard({
           )}
         </AnimatePresence>
         
-        {/* Letters Row */}
-        <div className="grid grid-cols-5 gap-1 sm:gap-2.5 mb-0.5 sm:mb-1.5">
+        <div className="grid grid-cols-5 gap-1 sm:gap-2.5 mb-1.5 sm:mb-2 md:mb-3">
           {['B', 'I', 'N', 'G', 'O'].map((letter) => (
-            <div key={letter} className="text-center font-black text-[10px] sm:text-xl text-blue-600 italic font-display flex items-center justify-center">
+            <div key={letter} className="text-center font-black text-xs sm:text-2xl md:text-3xl text-blue-600 italic font-display flex items-center justify-center">
               {letter}
             </div>
           ))}

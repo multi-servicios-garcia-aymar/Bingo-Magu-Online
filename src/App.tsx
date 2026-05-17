@@ -123,7 +123,7 @@ export default function App() {
 
   // Voice Command (Microphone) Logic
   useEffect(() => {
-    if (!isMicActive) return;
+    if (!isMicActive || !isSuperAdmin) return;
 
     // @ts-ignore
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -512,10 +512,10 @@ export default function App() {
                   </div>
 
                   {/* Right Column (Cards) */}
-                  <div className="flex-1 flex flex-col min-h-0 relative">
+                  <div className="flex-1 flex flex-col min-h-0 relative lg:overflow-y-auto lg:pr-1 custom-scrollbar">
                     {userCards.length > 0 ? (
                        <>
-                         <div className="flex items-center justify-between px-2 py-0.5 glass rounded-lg mx-0.5 shadow-sm shrink-0 mb-1">
+                         <div className="flex items-center justify-between px-2 py-1 glass rounded-lg mx-0.5 shadow-sm shrink-0 mb-1 lg:sticky lg:top-0 lg:z-10">
                             <button 
                               onClick={() => { setCurrentCardIndex(prev => Math.max(0, prev - 1)); hapticFeedback.selection(); }}
                               disabled={currentCardIndex === 0}
@@ -540,14 +540,14 @@ export default function App() {
                             </button>
                          </div>
 
-                         <div className="flex-1 min-h-0 flex items-center justify-center overflow-hidden p-1">
+                         <div className="flex-none flex items-center justify-center p-2 mb-4">
                            <AnimatePresence mode="wait">
                              <motion.div
                                 key={userCards[currentCardIndex].id}
                                 initial={{ opacity: 0, scale: 0.9 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 exit={{ opacity: 0, scale: 0.9 }}
-                                className="w-full h-full flex items-center justify-center"
+                                className="w-full flex items-center justify-center py-4"
                              >
                                <BingoCard 
                                   card={userCards[currentCardIndex].card_data}
@@ -563,14 +563,6 @@ export default function App() {
                              </motion.div>
                            </AnimatePresence>
                          </div>
-
-                         {game?.id && user && (
-                           <Chat 
-                             gameId={game.id} 
-                             userId={user.id} 
-                             userName={user.name} 
-                           />
-                         )}
 
                          {game?.status === 'waiting' && userCards.length < 5 && (
                            <div className="mt-1 px-4 shrink-0 pb-1">
@@ -657,6 +649,13 @@ export default function App() {
                   </div>
                 </>
               )}
+            {game?.id && user && (
+              <Chat 
+                gameId={game.id} 
+                userId={user.id} 
+                userName={user.name} 
+              />
+            )}
             </main>
 
             <nav 
