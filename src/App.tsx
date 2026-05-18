@@ -7,7 +7,8 @@ import { useEffect, useState, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Users, Play, RotateCcw, AlertCircle, Loader2, 
-  Grid3X3, X, ChevronLeft, ChevronRight, Trophy, Settings2
+  Grid3X3, X, ChevronLeft, ChevronRight, Trophy, Settings2,
+  Maximize2
 } from 'lucide-react';
 
 // Types
@@ -87,6 +88,7 @@ export default function App() {
   const [showSuperAdminPanel, setShowSuperAdminPanel] = useState(false);
   const [showRanking, setShowRanking] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [isAppReady, setIsAppReady] = useState(false);
   const [showWelcomeSplash, setShowWelcomeSplash] = useState(false);
@@ -99,6 +101,24 @@ export default function App() {
   }, [game?.winning_pattern]);
 
   const winPatternName = winPattern.name;
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
+
+  const toggleFullscreen = useCallback(() => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(err => {
+        console.warn(`Error attempting to enable fullscreen: ${err.message}`);
+      });
+    } else {
+      document.exitFullscreen();
+    }
+  }, []);
 
   // Sync index when game changes
   useEffect(() => { setCurrentCardIndex(0); }, [game?.id]);
@@ -121,7 +141,7 @@ export default function App() {
         window.speechSynthesis.speak(utterance);
       }
     }
-  }, [game?.current_number, game?.ball_limit, isMuted]);
+  }, [game?.current_number, game?.ball_limit, isMuted, playSound]);
 
   // Voice Command (Microphone) Logic
   useEffect(() => {
@@ -162,7 +182,7 @@ export default function App() {
 
     recognition.start();
     return () => recognition.stop();
-  }, [isMicActive, userCards, currentCardIndex]);
+  }, [isMicActive, isSuperAdmin, userCards, currentCardIndex]);
 
   // Auto-draw logic: Synchronized with Server
   useEffect(() => {
@@ -226,8 +246,6 @@ export default function App() {
   }, []);
 
   const handleJoin = useCallback(async () => {
-    // If we're in Telegram and have a tg user, we already set the 'user' state in useBingoAuth
-    // So if 'user' is missing, it means we really need auth (browser)
     if (!user) { 
       playSound('CLICK');
       setShowAuthModal(true); 
@@ -241,7 +259,6 @@ export default function App() {
       
       let targetGame = game;
 
-      // In custom or personal mode, if no active game exists, create one automatically
       if (!targetGame && (gameMode === 'custom' || gameMode === 'personal')) {
         const { data, error: createError } = await GameService.createSession({
           type: gameMode,
@@ -260,7 +277,6 @@ export default function App() {
         throw new Error('No hay una partida activa para unirse.');
       }
       
-      // Register cards
       for (let i = 0; i < cardCount; i++) {
         await register(targetGame.id, user.id, user.name, targetGame.ball_limit);
       }
@@ -268,7 +284,6 @@ export default function App() {
       setCardCount(1);
       if (view === 'lobby') setView('game');
       
-      // Announcement
       sendMessage('system', 'Bingo!', `¡${user.name} se ha unido con ${cardCount} ${cardCount === 1 ? 'tabla' : 'tablas'}! 👋`, 'system');
       
       // @ts-ignore
@@ -279,9 +294,8 @@ export default function App() {
     } finally { 
       setIsLoggingIn(false); 
     }
-  }, [user, game, gameMode, cardCount, register, view, setGame]);
+  }, [user, game, gameMode, cardCount, register, view, setGame, playSound, sendMessage]);
 
-  // Telegram BackButton Controller
   useEffect(() => {
     // @ts-ignore
     const tg = window.Telegram?.WebApp;
@@ -299,7 +313,6 @@ export default function App() {
     }
   }, [view, handleReset]);
 
-  // Telegram MainButton Controller
   useEffect(() => {
     // @ts-ignore
     const tg = window.Telegram?.WebApp;
@@ -324,22 +337,17 @@ export default function App() {
     } else {
       tg.MainButton.hide();
     }
-  }, [view, userCards, user, game, cardCount, handleJoin, handleBingo, currentCardIndex]);
+  }, [view, userCards.length, user, game, cardCount, handleJoin]);
 
-  // Telegram integration setup
   useEffect(() => {
     // @ts-ignore
     const tg = window.Telegram?.WebApp;
     if (tg) {
       tg.ready();
       tg.expand();
-      
-      // Sync theme colors if requested
       try {
         tg.setHeaderColor(tg.themeParams?.header_bg_color || '#ffffff');
         tg.setBackgroundColor(tg.themeParams?.bg_color || '#f8fafc');
-        
-        // Optimize for Mini App - disable vertical swipes to prevent accidental closing
         if (tg.isVersionAtLeast('7.7')) {
           tg.requestFullscreen?.();
         }
@@ -349,13 +357,12 @@ export default function App() {
     }
   }, []);
 
-  // Splash Screen Delay
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsAppReady(true);
       // @ts-ignore
       window.Telegram?.WebApp?.ready();
-    }, 15000); // 15 seconds as requested by user
+    }, 15000); 
     return () => clearTimeout(timer);
   }, []);
 
@@ -370,7 +377,6 @@ export default function App() {
     await GameService.finishSession(game.id);
   };
 
-
   const handleProfileUpdate = useCallback((data: { username?: string, avatarUrl?: string }) => {
     setUser(prev => {
       if (!prev) return null;
@@ -380,11 +386,10 @@ export default function App() {
         avatarUrl: data.avatarUrl ?? prev.avatarUrl
       };
     });
-  }, []);
+  }, [setUser]);
 
   const handleStartRequest = async () => {
     if (!game || game.status === 'finished') { setShowConfig(true); return; }
-    // Only super admin can start global games
     if (gameMode === 'global' && !isSuperAdmin) return;
     
     await GameService.startSession(game.id);
@@ -405,9 +410,7 @@ export default function App() {
     } catch (e: any) { setError(e.message); }
   };
 
-
   const handleModeSelect = useCallback((mode: GameMode) => {
-    // Re-initialize state before opening modal
     setError(null);
     setGameMode(mode);
     setView('game');
@@ -420,10 +423,9 @@ export default function App() {
   }, []);
 
   return (
-    <div className={`h-[100dvh] flex flex-row font-sans transition-colors overflow-hidden items-stretch justify-center gap-0 lg:gap-4 ${gameMode === 'global' ? 'bg-slate-100' : 'bg-indigo-100/30'}`}>
+    <div className={`h-[100dvh] w-full flex flex-row font-sans transition-colors overflow-hidden items-stretch justify-center gap-0 lg:gap-4 ${gameMode === 'global' ? 'bg-slate-100' : 'bg-indigo-100/30'}`}>
       <SplashScreen isVisible={!isAppReady || showWelcomeSplash} user={user} />
       
-      {/* Lateral Ad Left */}
       {!isTelegram && (
         <div className="hidden lg:flex w-24 xl:w-48 flex-col py-4 shrink-0">
           <SidebarAd ad={sidebarAds[0]} />
@@ -431,7 +433,16 @@ export default function App() {
         </div>
       )}
 
-      <div className="w-full max-w-2xl lg:max-w-6xl h-full flex flex-col bg-white shadow-2xl relative overflow-hidden">
+      {!isTelegram && !isFullscreen && isAppReady && (
+        <button 
+          onClick={toggleFullscreen}
+          className="fixed top-4 right-4 z-[200] bg-blue-600 text-white p-3 rounded-full shadow-2xl animate-bounce active:scale-95 transition-all"
+        >
+          <Maximize2 className="w-6 h-6" />
+        </button>
+      )}
+
+      <div className={`w-full max-w-2xl lg:max-w-6xl h-full flex flex-col bg-white shadow-2xl relative overflow-hidden ${isFullscreen ? 'rounded-none' : ''}`}>
         {view === 'lobby' ? (
           <GameLobby onSelectMode={handleModeSelect} />
         ) : (
@@ -460,41 +471,41 @@ export default function App() {
             />
 
             {(error || gameError) && (
-              <div className="bg-red-50 border-b border-red-100 p-2 flex items-center justify-between">
-                <div className="flex items-center gap-2">
+              <div className="bg-red-50 border-b border-red-100 px-2 py-1 flex items-center justify-between shrink-0">
+                <div className="flex items-center gap-1.5">
                   <AlertCircle className="w-3 h-3 text-red-500" />
-                  <span className="text-[9px] font-medium text-red-700">{error || (gameError as string)}</span>
+                  <span className="text-[8px] font-medium text-red-700">{error || (gameError as string)}</span>
                 </div>
-                <button onClick={() => setError(null)} className="text-red-400 p-1"><X className="w-3 h-3" /></button>
+                <button onClick={() => setError(null)} className="text-red-400 p-0.5"><X className="w-3 h-3" /></button>
               </div>
             )}
 
-            <main className="flex-1 overflow-hidden flex flex-col lg:flex-row p-0.5 lg:gap-2 relative">
+            <main className="flex-1 overflow-hidden flex flex-col lg:flex-row p-0 lg:gap-2 relative">
               {loading ? (
                 <div className="flex-1 flex items-center justify-center">
-                  <div className="flex flex-col items-center gap-3">
-                    <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
-                    <span className="text-[10px] font-black text-slate-300 uppercase italic animate-pulse">Iniciando Bingo...</span>
+                  <div className="flex flex-col items-center gap-2">
+                    <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+                    <span className="text-[9px] font-black text-slate-300 uppercase italic animate-pulse">Iniciando...</span>
                   </div>
                 </div>
               ) : (
-                <>
+                <div className="flex-1 flex flex-col lg:flex-row h-full overflow-hidden p-0.5 lg:p-1 gap-0.5 lg:gap-2">
                   <AnimatePresence>
                     {isRefreshing && (
                       <motion.div 
                         initial={{ opacity: 0, y: -10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -10 }}
-                        className="absolute top-2 left-1/2 -translate-x-1/2 z-50 bg-blue-600/90 text-white px-3 py-1 rounded-full flex items-center gap-2 shadow-lg backdrop-blur-sm"
+                        className="absolute top-1 left-1/2 -translate-x-1/2 z-50 bg-blue-600/90 text-white px-2 py-0.5 rounded-full flex items-center gap-1.5 shadow-lg backdrop-blur-sm"
                       >
-                         <Loader2 className="w-3 h-3 animate-spin" />
-                         <span className="text-[8px] font-black uppercase italic">Sincronizando...</span>
+                         <Loader2 className="w-2.5 h-2.5 animate-spin" />
+                         <span className="text-[7px] font-black uppercase italic">Sincronizando...</span>
                       </motion.div>
                     )}
                   </AnimatePresence>
 
                   {/* Left Column (Board) */}
-                  <div className="shrink-0 lg:w-[45%] flex flex-col space-y-0.1">
+                  <div className="shrink-0 lg:w-[45%] flex flex-col space-y-0">
                     <div className="shrink-0">
                       <GameStateInfo 
                         game={game as any} 
@@ -503,7 +514,7 @@ export default function App() {
                       />
                     </div>
                     
-                    <div className="shrink-0 bg-white/40 p-0.5 rounded-lg shadow-inner border border-white/40 relative group overflow-hidden">
+                    <div className="flex-1 min-h-0 bg-white/40 p-0.5 rounded-lg shadow-inner border border-white/40 relative group overflow-hidden flex flex-col">
                        {!user && game && (
                          <div 
                            onClick={() => setShowAuthModal(true)}
@@ -515,8 +526,10 @@ export default function App() {
                            </div>
                          </div>
                        )}
-                       <BingoBoard drawnNumbers={game?.drawn_numbers || []} ballLimit={game?.ball_limit || 75} />
-                       <div className="h-3 overflow-hidden mt-0.1">
+                       <div className="flex-1 min-h-0">
+                        <BingoBoard drawnNumbers={game?.drawn_numbers || []} ballLimit={game?.ball_limit || 75} />
+                       </div>
+                       <div className="h-2.5 overflow-hidden mt-0.5 shrink-0 opacity-80 scale-95">
                          <HistoryRail drawnNumbers={game?.drawn_numbers || []} />
                        </div>
                     </div>
@@ -525,8 +538,8 @@ export default function App() {
                   {/* Right Column (Cards) */}
                   <div className="flex-1 flex flex-col min-h-0 relative overflow-hidden lg:pr-1">
                     {userCards.length > 0 ? (
-                       <>
-                         <div className="flex items-center justify-between px-2 py-0.5 glass rounded-lg mx-0.5 shadow-sm shrink-0 mb-0.5 lg:sticky lg:top-0 lg:z-10">
+                       <div className="h-full flex flex-col overflow-hidden">
+                         <div className="flex items-center justify-between px-2 py-0 glass rounded-lg mx-0.5 shadow-sm shrink-0 mb-0.5">
                             <button 
                               onClick={() => { setCurrentCardIndex(prev => Math.max(0, prev - 1)); hapticFeedback.selection(); }}
                               disabled={currentCardIndex === 0}
@@ -535,11 +548,11 @@ export default function App() {
                             </button>
                             
                             <div className="flex flex-col items-center">
-                              <span className="text-[5px] font-black text-slate-400 uppercase italic tracking-widest leading-none">TABLA</span>
+                              <span className="text-[4px] font-black text-slate-400 uppercase italic tracking-widest leading-none">TABLA</span>
                               <div className="flex items-center gap-1">
-                                <div className="text-[9px] font-black text-blue-700 italic font-display">#{currentCardIndex + 1}</div>
-                                <div className="h-1.5 w-px bg-slate-200"></div>
-                                <div className="text-[7px] font-bold text-slate-400 uppercase">{userCards.length} TOTAL</div>
+                                <div className="text-[8px] font-black text-blue-700 italic font-display">#{currentCardIndex + 1}</div>
+                                <div className="h-1 w-px bg-slate-200"></div>
+                                <div className="text-[6px] font-bold text-slate-400 uppercase">{userCards.length} TOTAL</div>
                               </div>
                             </div>
 
@@ -551,108 +564,76 @@ export default function App() {
                             </button>
                          </div>
 
-                         <div className="flex-1 flex items-center justify-center p-0.5 overflow-hidden">
+                         <div className="flex-1 flex items-center justify-center p-0 overflow-hidden">
                            <AnimatePresence mode="wait">
                              <motion.div
-                                key={userCards[currentCardIndex].id}
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0, scale: 0.95 }}
-                                className="w-full h-full flex items-center justify-center"
-                             >
-                               <BingoCard 
-                                  card={userCards[currentCardIndex].card_data}
-                                  initialMarkedKeys={userCards[currentCardIndex].marked_keys || []}
-                                  onToggleMark={(marks) => { playSound('CLICK'); updateMarks(userCards[currentCardIndex].id, marks); }}
-                                  drawnNumbers={game?.drawn_numbers || []}
-                                  onBingo={handleBingo}
-                                  gameFinished={game?.status === 'finished'}
-                                  isWinner={userCards[currentCardIndex].has_won}
-                                  winningPatternId={game?.winning_pattern}
-                                  winningPatternName={winPatternName}
-                                />
-                             </motion.div>
+                                 key={userCards[currentCardIndex].id}
+                                 initial={{ opacity: 0, scale: 0.98 }}
+                                 animate={{ opacity: 1, scale: 1 }}
+                                 exit={{ opacity: 0, scale: 0.98 }}
+                                 className="w-full h-full flex items-center justify-center"
+                              >
+                                <BingoCard 
+                                   card={userCards[currentCardIndex].card_data}
+                                   initialMarkedKeys={userCards[currentCardIndex].marked_keys || []}
+                                   onToggleMark={(marks) => { playSound('CLICK'); updateMarks(userCards[currentCardIndex].id, marks); }}
+                                   drawnNumbers={game?.drawn_numbers || []}
+                                   onBingo={handleBingo}
+                                   gameFinished={game?.status === 'finished'}
+                                   isWinner={userCards[currentCardIndex].has_won}
+                                   winningPatternId={game?.winning_pattern}
+                                   winningPatternName={winPatternName}
+                                 />
+                              </motion.div>
                            </AnimatePresence>
                          </div>
-
-                         {game?.status === 'waiting' && userCards.length < 5 && (
-                           <div className="mt-1 px-4 shrink-0 pb-1 space-y-2">
-                             <div className="flex items-center justify-between bg-blue-50/50 p-1.5 rounded-xl border border-blue-100/30">
-                               <span className="text-[8px] font-black text-slate-500 uppercase italic">Añadir más:</span>
-                               <div className="flex items-center gap-1">
-                                 {Array.from({ length: 5 - userCards.length }, (_, i) => i + 1).map(num => (
-                                   <button
-                                     key={num}
-                                     onClick={() => { setCardCount(num); hapticFeedback.selection(); }}
-                                     className={`w-7 h-7 rounded-lg font-black text-[10px] transition-all border ${cardCount === num ? 'bg-blue-600 text-white border-blue-600 shadow-md shadow-blue-200' : 'bg-white text-slate-500 border-slate-100 hover:bg-slate-50'}`}
-                                   >
-                                     {num}
-                                   </button>
-                                 ))}
-                               </div>
-                             </div>
-                             <button onClick={handleJoin} className="w-full text-[8px] font-black text-blue-600 uppercase italic flex items-center justify-center gap-1 bg-blue-50 py-1.5 rounded-lg border border-blue-200 shadow-sm active:scale-95 transition-all">
-                               <Grid3X3 className="w-3 h-3" />
-                               Generar {cardCount} {cardCount === 1 ? 'tabla' : 'tablas'} adicional{cardCount === 1 ? '' : 'es'}
-                             </button>
-                           </div>
-                         )}
-      
-                         {game?.status === 'finished' && (
-                           <div className="mt-1 px-4 shrink-0 pb-1">
-                             <button onClick={handleReset} className="w-full py-2 bg-slate-900 shadow-xl text-white rounded-xl font-black uppercase italic text-xs active:scale-95 transition-all flex items-center justify-center gap-2">
-                               <RotateCcw className="w-4 h-4" />
-                               Reiniciar Juego
-                             </button>
-                           </div>
-                         )}
-                       </>
-                     ) : (
-                       <div className="flex-1 flex flex-col items-center justify-center py-1 space-y-2">
+                       </div>
+                    ) : (
+                       <div className="flex-1 flex flex-col items-center justify-center py-0.5 space-y-1.5">
                          <div 
                            onClick={() => {
                              if (!user) {
-                               hapticFeedback.impact('light');
-                               setShowAuthModal(true);
+                                hapticFeedback.impact('light');
+                                setShowAuthModal(true);
                              }
                            }}
-                           className={`text-center space-y-2 ${!user ? 'cursor-pointer hover:bg-slate-50/50 p-1.5 rounded-2xl transition-all active:scale-95' : ''}`}
+                           className={`text-center space-y-1 ${!user ? 'cursor-pointer hover:bg-slate-50/50 p-1.5 rounded-2xl transition-all active:scale-95' : ''}`}
                          >
                            <div className="relative inline-block">
-                             <div className="w-12 h-12 bg-blue-50/50 text-blue-200 rounded-2xl flex items-center justify-center mx-auto shadow-inner border border-blue-100/50">
-                               <Users className="w-6 h-6" />
+                             <div className="w-10 h-10 bg-blue-50/50 text-blue-200 rounded-2xl flex items-center justify-center mx-auto shadow-inner border border-blue-100/50">
+                               <Users className="w-5 h-5" />
                              </div>
                              {!user && (
                                <div className="absolute -top-1 -right-1 bg-blue-600 text-white p-0.5 rounded-full shadow-lg border-2 border-white animate-bounce">
-                                 <Play className="w-2.5 h-2.5 fill-current" />
+                                 <Play className="w-2 h-2 fill-current" />
                                </div>
                              )}
                            </div>
-                           <div className="space-y-0.5">
-                             <h3 className="font-black text-slate-800 uppercase italic leading-none font-display text-sm">
+                           <div className="space-y-0">
+                             <h3 className="font-black text-slate-800 uppercase italic leading-none font-display text-xs">
                                {user ? 'Genera tus Tablas' : 'Inicia Sesión'}
                              </h3>
-                             <p className="text-[8px] text-slate-400 font-bold uppercase tracking-wider max-w-[180px] mx-auto">
-                               {user ? 'Selecciona cuántas tablas' : 'Para participar en la partida'}
+                             <p className="text-[7px] text-slate-400 font-bold uppercase tracking-wider max-w-[150px] mx-auto">
+                               {user ? 'Selecciona cantidad' : 'Para participar'}
                              </p>
                            </div>
                          </div>
 
-                          <div className="w-full px-4">
-                            <div className="glass rounded-[1.5rem] p-2.5 space-y-2.5 shadow-xl border border-white">
+                          <div className="w-full px-3">
+                            <div className="glass rounded-[1.2rem] p-2 space-y-2 shadow-xl border border-white">
                               {user && (
                                 <div className="flex items-center justify-between">
-                                  <span className="text-[8px] font-black text-slate-500 uppercase italic">Cant. Tablas</span>
-                                  <div className="flex items-center gap-1.5">
-                                     {[1, 2, 3, 4, 5].map(num => (
-                                       <button
-                                         key={num}
-                                         onClick={() => { setCardCount(num); hapticFeedback.selection(); }}
-                                         className={`w-8 h-8 rounded-lg font-black text-xs transition-all border-2 ${cardCount === num ? 'bg-blue-600 text-white border-blue-600 shadow-md shadow-blue-200' : 'bg-white text-slate-600 border-slate-100 hover:bg-slate-50'}`}
-                                       >
-                                         {num}
-                                       </button>
-                                     ))}
+                                  <span className="text-[7px] font-black text-slate-500 uppercase italic">Cant. Tablas</span>
+                                  <div className="flex items-center gap-1">
+                                      {[1, 2, 3, 4, 5].map(num => (
+                                        <button
+                                          key={num}
+                                          onClick={() => { setCardCount(num); hapticFeedback.selection(); }}
+                                          className={`w-7 h-7 rounded-lg font-black text-[10px] transition-all border-2 ${cardCount === num ? 'bg-blue-600 text-white border-blue-600 shadow-md shadow-blue-200' : 'bg-white text-slate-600 border-slate-100 hover:bg-slate-50'}`}
+                                        >
+                                          {num}
+                                        </button>
+                                      ))}
                                   </div>
                                 </div>
                               )}
@@ -660,19 +641,19 @@ export default function App() {
                               <button 
                                  onClick={user ? handleJoin : () => { hapticFeedback.impact('light'); setShowAuthModal(true); }}
                                  disabled={(game && game.status !== 'waiting') || isLoggingIn}
-                                 className={`w-full py-2.5 shadow-lg active:scale-95 transition-all text-white rounded-xl font-black uppercase italic text-[10px] flex items-center justify-center gap-2 disabled:opacity-50 ${gameMode === 'global' ? 'bg-blue-600 shadow-blue-200' : 'bg-indigo-600 shadow-indigo-200'}`}
+                                 className={`w-full py-2 shadow-lg active:scale-95 transition-all text-white rounded-xl font-black uppercase italic text-[9px] flex items-center justify-center gap-2 disabled:opacity-50 ${gameMode === 'global' ? 'bg-blue-600 shadow-blue-200' : 'bg-indigo-600 shadow-indigo-200'}`}
                                >
-                                 {isLoggingIn ? <Loader2 className="w-4 h-4 animate-spin" /> : (
-                                   user ? <Grid3X3 className="w-4 h-4" /> : <Play className="w-4 h-4 fill-current" />
+                                 {isLoggingIn ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : (
+                                   user ? <Grid3X3 className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 fill-current" />
                                  )}
                                  {!user ? 'Iniciar Sesión' : `Generar ${cardCount} ${cardCount === 1 ? 'Tabla' : 'Tablas'}`}
                                </button>
                             </div>
                           </div>
                        </div>
-                     )}
+                    )}
                   </div>
-                </>
+                </div>
               )}
             </main>
             
@@ -685,31 +666,31 @@ export default function App() {
             )}
 
             <nav 
-              className="bg-white border-t border-slate-200 flex items-center justify-around py-0.5 flex-shrink-0 shadow-sm"
-              style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+              className="bg-white border-t border-slate-200 flex items-center justify-around py-0.5 flex-shrink-0 shadow-sm z-[60]"
+              style={{ paddingBottom: 'max(0.25rem, env(safe-area-inset-bottom))' }}
             >
-              <div className="flex flex-col items-center gap-0 text-blue-600 cursor-pointer min-w-[60px] py-1 active:scale-95 transition-transform" onClick={() => setView('lobby')}>
-                <Users className="w-4 h-4" />
-                <span className="text-[7px] font-black uppercase italic tracking-tighter">Comunidad</span>
+              <div className="flex flex-col items-center gap-0 text-blue-600 cursor-pointer min-w-[50px] py-0.5 active:scale-95 transition-transform" onClick={() => setView('lobby')}>
+                <Users className="w-3.5 h-3.5" />
+                <span className="text-[6px] font-black uppercase italic tracking-tighter">Lobby</span>
               </div>
               
               <div 
                 onClick={() => setShowRanking(true)}
-                className="bg-blue-50 px-3 py-1.5 rounded-xl border border-blue-100 flex items-center gap-1.5 shadow-inner cursor-pointer hover:bg-blue-100 transition-colors active:scale-95"
+                className="bg-blue-50 px-2 py-1 rounded-lg border border-blue-100 flex items-center gap-1 shadow-inner cursor-pointer hover:bg-blue-100 transition-colors active:scale-95"
               >
-                <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(59,130,246,0.6)]" />
+                <div className="w-1 h-1 bg-blue-500 rounded-full animate-pulse" />
                 <div className="flex flex-col items-center">
-                  <span className="text-[8px] font-black text-blue-700 italic uppercase leading-none">{uniqueParticipantsCount} JUGADORES</span>
-                  <span className="text-[6px] font-bold text-blue-400 uppercase tracking-tighter">{participantsCount} TABLAS ACTIVAS</span>
+                  <span className="text-[7px] font-black text-blue-700 italic uppercase leading-none">{uniqueParticipantsCount} JUGADORES</span>
+                  <span className="text-[5px] font-bold text-blue-400 uppercase tracking-tighter">{participantsCount} TABLAS</span>
                 </div>
               </div>
 
               <div 
-                className="flex flex-col items-center gap-0 text-blue-600 cursor-pointer min-w-[60px] py-1 active:scale-90 transition-transform" 
+                className="flex flex-col items-center gap-0 text-blue-600 cursor-pointer min-w-[50px] py-0.5 active:scale-90 transition-transform" 
                 onClick={() => setShowRanking(true)}
               >
-                <RotateCcw className="w-4 h-4" />
-                <span className="text-[7px] font-black uppercase italic tracking-tighter">Ranking</span>
+                <Trophy className="w-3.5 h-3.5" />
+                <span className="text-[6px] font-black uppercase italic tracking-tighter">Ranking</span>
               </div>
             </nav>
           </>
