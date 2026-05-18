@@ -516,7 +516,7 @@ export default function App() {
                       />
                     </div>
                     
-                    <div className="flex-1 min-h-0 bg-white/40 p-0.5 rounded-lg shadow-inner border border-white/40 relative group overflow-hidden flex flex-col">
+                    <div className="flex-none lg:flex-1 bg-white/40 p-0.5 rounded-lg shadow-inner border border-white/40 relative group overflow-hidden flex flex-col">
                        {!user && game && (
                          <div 
                            onClick={() => setShowAuthModal(true)}
@@ -566,14 +566,14 @@ export default function App() {
                             </button>
                          </div>
 
-                         <div className="flex-1 flex flex-col items-center justify-start p-0 overflow-y-auto pt-1">
+                         <div className="flex-1 flex flex-col items-center justify-start p-0 overflow-y-auto pt-0">
                            <AnimatePresence mode="wait">
                              <motion.div
                                  key={userCards[currentCardIndex].id}
                                  initial={{ opacity: 0, scale: 0.98 }}
                                  animate={{ opacity: 1, scale: 1 }}
                                  exit={{ opacity: 0, scale: 0.98 }}
-                                 className="w-full h-fit flex items-center justify-center pb-4"
+                                 className="w-full h-fit flex items-center justify-center pb-2"
                               >
                                 <BingoCard 
                                    card={userCards[currentCardIndex].card_data}
@@ -671,44 +671,44 @@ export default function App() {
             )}
 
             <nav 
-              className="bg-white border-t border-slate-200 flex items-center justify-around py-1 flex-shrink-0 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] z-[60]"
-              style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}
+              className="bg-white border-t border-slate-200 flex items-center justify-around py-2 flex-shrink-0 shadow-[0_-8px_20px_rgba(0,0,0,0.06)] z-[60]"
+              style={{ paddingBottom: 'max(2rem, env(safe-area-inset-bottom))' }}
             >
-              <div className="flex flex-col items-center gap-0.5 text-blue-600 cursor-pointer min-w-[60px] py-1 active:scale-95 transition-transform" onClick={() => setView('lobby')}>
-                <Users className="w-4 h-4" />
-                <span className="text-[7px] font-black uppercase italic tracking-tighter">Lobby</span>
+              <div className="flex flex-col items-center gap-1 text-blue-600 cursor-pointer min-w-[65px] py-1 active:scale-95 transition-transform" onClick={() => setView('lobby')}>
+                <Users className="w-5 h-5" />
+                <span className="text-[8px] font-black uppercase italic tracking-tighter">Lobby</span>
               </div>
               
               <div 
                 onClick={() => setShowRanking(true)}
-                className="bg-blue-50 px-3 py-1.5 rounded-xl border border-blue-100 flex items-center gap-2 shadow-inner cursor-pointer hover:bg-blue-100 transition-colors active:scale-95"
+                className="bg-blue-50 px-4 py-2 rounded-2xl border border-blue-100 flex items-center gap-2 shadow-inner cursor-pointer hover:bg-blue-100 transition-colors active:scale-95"
               >
-                <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
+                <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
                 <div className="flex flex-col items-center">
-                  <span className="text-[8px] font-black text-blue-700 italic uppercase leading-none">{uniqueParticipantsCount} JUGADORES</span>
-                  <span className="text-[6px] font-bold text-blue-400 uppercase tracking-tighter">{participantsCount} TABLAS</span>
+                  <span className="text-[9px] font-black text-blue-700 italic uppercase leading-none">{uniqueParticipantsCount} JUGADORES</span>
+                  <span className="text-[7px] font-bold text-blue-400 uppercase tracking-tighter">{participantsCount} TABLAS</span>
                 </div>
               </div>
 
               <div 
-                className="flex flex-col items-center gap-0.5 text-blue-600 cursor-pointer min-w-[60px] py-1 active:scale-95 transition-transform relative" 
+                className="flex flex-col items-center gap-1 text-blue-600 cursor-pointer min-w-[65px] py-1 active:scale-95 transition-transform relative" 
                 onClick={() => { setIsChatOpen(!isChatOpen); hapticFeedback.selection(); }}
               >
-                <MessageSquare className={`w-4 h-4 ${isChatOpen ? 'fill-current' : ''}`} />
-                <span className="text-[7px] font-black uppercase italic tracking-tighter">{isChatOpen ? 'Cerrar' : 'Chat'}</span>
+                <MessageSquare className={`w-5 h-5 ${isChatOpen ? 'fill-current' : ''}`} />
+                <span className="text-[8px] font-black uppercase italic tracking-tighter">{isChatOpen ? 'Cerrar' : 'Chat'}</span>
                 {!isChatOpen && unreadChatCount > 0 && (
-                  <span className="absolute -top-1 right-2 bg-red-600 text-white text-[8px] font-black w-4 h-4 flex items-center justify-center rounded-full animate-pulse border-2 border-white">
+                  <span className="absolute -top-1.5 right-2 bg-red-600 text-white text-[9px] font-black w-5 h-5 flex items-center justify-center rounded-full animate-pulse border-2 border-white">
                     {unreadChatCount > 9 ? '9+' : unreadChatCount}
                   </span>
                 )}
               </div>
 
               <div 
-                className="flex flex-col items-center gap-0.5 text-blue-600 cursor-pointer min-w-[60px] py-1 active:scale-90 transition-transform" 
+                className="flex flex-col items-center gap-1 text-blue-600 cursor-pointer min-w-[65px] py-1 active:scale-90 transition-transform" 
                 onClick={() => setShowRanking(true)}
               >
-                <Trophy className="w-4 h-4" />
-                <span className="text-[7px] font-black uppercase italic tracking-tighter">Ranking</span>
+                <Trophy className="w-5 h-5" />
+                <span className="text-[8px] font-black uppercase italic tracking-tighter">Ranking</span>
               </div>
             </nav>
           </>

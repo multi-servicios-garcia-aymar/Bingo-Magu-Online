@@ -62,11 +62,11 @@ export default function BingoCard({
   const isDrawn = (val: number) => val === 0 || drawnNumbers.includes(val);
   
   return (
-    <div className="flex flex-col items-center space-y-0.1 w-full max-w-[350px] sm:max-w-md mx-auto py-0 px-1 justify-center relative">
-      <div className={`bg-white p-1 rounded-[1rem] sm:p-4 sm:rounded-[2.5rem] shadow-2xl border border-slate-100 w-full relative transition-all duration-700 shrink-0 ${isWinner ? 'winner-glow scale-105 ring-4 ring-green-400/30' : ''}`}>
+    <div className="flex flex-col items-center space-y-0 w-full max-w-[350px] sm:max-w-md mx-auto py-0 px-1 justify-center relative">
+      <div className={`bg-white p-0.5 rounded-[1rem] sm:p-4 sm:rounded-[2.5rem] shadow-2xl border border-slate-100 w-full relative transition-all duration-700 shrink-0 ${isWinner ? 'winner-glow scale-105 ring-4 ring-green-400/30' : ''}`}>
         
         {/* Numbers Grid - Perfect Square */}
-        <div className="grid grid-cols-5 gap-1 mb-0.5 sm:mb-2 italic">
+        <div className="grid grid-cols-5 gap-0.5 mb-0.5 sm:mb-2 italic">
           {['B', 'I', 'N', 'G', 'O'].map((letter) => (
             <div key={letter} className="text-center font-black text-xs sm:text-2xl text-blue-600 flex items-center justify-center">
               {letter}
