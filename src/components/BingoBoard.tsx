@@ -42,7 +42,7 @@ export default function BingoBoard({ drawnNumbers, ballLimit }: BingoBoardProps)
           const numbers = Array.from({ length: max - min + 1 }, (_, i) => min + i);
           
           return (
-            <div key={colName} className="flex items-center gap-1 mb-0.5">
+            <div key={colName} className="flex items-center gap-1 mb-0">
               <div className="w-4 h-4 flex-shrink-0 bg-blue-600 text-white rounded-md flex items-center justify-center text-[10px] font-black italic shadow-sm border border-blue-500/30">
                 {colName}
               </div>

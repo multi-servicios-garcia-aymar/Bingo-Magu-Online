@@ -573,7 +573,7 @@ export default function App() {
                                  initial={{ opacity: 0, scale: 0.98 }}
                                  animate={{ opacity: 1, scale: 1 }}
                                  exit={{ opacity: 0, scale: 0.98 }}
-                                 className="w-full h-fit flex items-center justify-center pb-2"
+                                 className="w-full h-fit flex items-center justify-center pb-1"
                               >
                                 <BingoCard 
                                    card={userCards[currentCardIndex].card_data}
@@ -671,8 +671,8 @@ export default function App() {
             )}
 
             <nav 
-              className="bg-white border-t border-slate-200 flex items-center justify-around py-2 flex-shrink-0 shadow-[0_-8px_20px_rgba(0,0,0,0.06)] z-[60]"
-              style={{ paddingBottom: 'max(2rem, env(safe-area-inset-bottom))' }}
+              className="bg-white border-t border-slate-200 flex items-center justify-around py-1.5 flex-shrink-0 shadow-[0_-8px_20px_rgba(0,0,0,0.06)] z-[60]"
+              style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}
             >
               <div className="flex flex-col items-center gap-1 text-blue-600 cursor-pointer min-w-[65px] py-1 active:scale-95 transition-transform" onClick={() => setView('lobby')}>
                 <Users className="w-5 h-5" />

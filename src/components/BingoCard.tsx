@@ -115,7 +115,7 @@ export default function BingoCard({
         </div>
       </div>
 
-      <div className="w-full flex flex-col gap-0.1 sm:gap-2 shrink-0 min-h-[30px] sm:min-h-[60px] justify-center mt-0.5">
+      <div className="w-full flex flex-col gap-0 justify-center mt-0.5">
         <AnimatePresence mode="wait">
           {isWinner ? (
             <motion.div 
@@ -147,7 +147,7 @@ export default function BingoCard({
           )}
         </AnimatePresence>
 
-        <div className="text-[6px] font-black text-slate-300 uppercase tracking-[0.2em] italic text-center leading-none mt-0.2">
+        <div className="text-[6px] font-black text-slate-300 uppercase tracking-[0.2em] italic text-center leading-none mt-0">
           VERIFICA SEGÚN {winningPatternName}
         </div>
       </div>
