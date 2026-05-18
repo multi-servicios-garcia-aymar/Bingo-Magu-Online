@@ -516,7 +516,7 @@ export default function App() {
                       />
                     </div>
                     
-                    <div className="flex-1 min-h-0 bg-white/40 p-0.5 rounded-b-lg shadow-inner border-x border-b border-white/40 relative group overflow-hidden flex flex-col">
+                    <div className="flex-1 min-h-0 bg-white/40 p-0.5 rounded-lg shadow-inner border border-white/40 relative group overflow-hidden flex flex-col">
                        {!user && game && (
                          <div 
                            onClick={() => setShowAuthModal(true)}
@@ -531,53 +531,14 @@ export default function App() {
                        <div className="flex-1 min-h-0">
                         <BingoBoard drawnNumbers={game?.drawn_numbers || []} ballLimit={game?.ball_limit || 75} />
                        </div>
-                    </div>
-                  </div>
-
-                  {/* Middle Navigation (Mobile Only) */}
-                  <div className="flex lg:hidden items-center justify-around py-2 bg-slate-50/80 backdrop-blur-sm border-y border-slate-200 shrink-0">
-                    <div className="flex flex-col items-center gap-0.5 text-blue-600 cursor-pointer min-w-[60px]" onClick={() => setView('lobby')}>
-                      <Users className="w-4 h-4" />
-                      <span className="text-[7px] font-black uppercase italic">Lobby</span>
-                    </div>
-
-                    <div 
-                      onClick={() => setShowRanking(true)}
-                      className="bg-white px-3 py-1 rounded-full border border-blue-100 flex items-center gap-2 shadow-sm cursor-pointer"
-                    >
-                      <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
-                      <div className="flex flex-col items-center">
-                        <span className="text-[8px] font-black text-blue-700 italic uppercase leading-none">{uniqueParticipantsCount} JUGADORES</span>
-                        <span className="text-[6px] font-bold text-blue-400 uppercase tracking-tighter">{participantsCount} TABLAS</span>
-                      </div>
-                    </div>
-
-                    <div 
-                      className="flex flex-col items-center gap-0.5 text-blue-600 cursor-pointer min-w-[60px] relative" 
-                      onClick={() => { setIsChatOpen(!isChatOpen); hapticFeedback.selection(); }}
-                    >
-                      <MessageSquare className={`w-4 h-4 ${isChatOpen ? 'fill-current' : ''}`} />
-                      <span className="text-[7px] font-black uppercase italic">{isChatOpen ? 'Cerrar' : 'Chat'}</span>
-                      {!isChatOpen && unreadChatCount > 0 && (
-                        <span className="absolute -top-1 right-2 bg-red-600 text-white text-[8px] font-black w-3.5 h-3.5 flex items-center justify-center rounded-full animate-pulse border border-white">
-                          {unreadChatCount > 9 ? '9+' : unreadChatCount}
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="flex flex-col items-center gap-0.5 text-blue-600 cursor-pointer min-w-[60px]" onClick={() => setShowRanking(true)}>
-                      <Trophy className="w-4 h-4" />
-                      <span className="text-[7px] font-black uppercase italic">Ranking</span>
+                       <div className="h-2.5 overflow-hidden mt-0.5 shrink-0 opacity-80 scale-95">
+                         <HistoryRail drawnNumbers={game?.drawn_numbers || []} />
+                       </div>
                     </div>
                   </div>
 
                   {/* Right Column (Cards) */}
-                  <div className="flex-1 flex flex-col min-h-0 relative overflow-hidden lg:pr-1 pt-1">
-                    {/* History Rail (Moved here on mobile for better flow) */}
-                    <div className="lg:hidden h-3 overflow-hidden mb-1 shrink-0 px-2">
-                       <HistoryRail drawnNumbers={game?.drawn_numbers || []} />
-                    </div>
-
+                  <div className="flex-1 flex flex-col min-h-0 relative overflow-hidden lg:pr-1 pt-0">
                     {userCards.length > 0 ? (
                        <div className="h-full flex flex-col overflow-hidden">
                          <div className="flex items-center justify-between px-2 py-0 glass rounded-lg mx-0.5 shadow-sm shrink-0 mb-0.5">
@@ -709,10 +670,47 @@ export default function App() {
               />
             )}
 
-            <div 
-              className="bg-white h-[env(safe-area-inset-bottom)] w-full shrink-0 lg:hidden"
-              style={{ height: 'max(0.5rem, env(safe-area-inset-bottom))' }}
-            />
+            <nav 
+              className="bg-white border-t border-slate-200 flex items-center justify-around py-1 flex-shrink-0 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] z-[60]"
+              style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}
+            >
+              <div className="flex flex-col items-center gap-0.5 text-blue-600 cursor-pointer min-w-[60px] py-1 active:scale-95 transition-transform" onClick={() => setView('lobby')}>
+                <Users className="w-4 h-4" />
+                <span className="text-[7px] font-black uppercase italic tracking-tighter">Lobby</span>
+              </div>
+              
+              <div 
+                onClick={() => setShowRanking(true)}
+                className="bg-blue-50 px-3 py-1.5 rounded-xl border border-blue-100 flex items-center gap-2 shadow-inner cursor-pointer hover:bg-blue-100 transition-colors active:scale-95"
+              >
+                <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
+                <div className="flex flex-col items-center">
+                  <span className="text-[8px] font-black text-blue-700 italic uppercase leading-none">{uniqueParticipantsCount} JUGADORES</span>
+                  <span className="text-[6px] font-bold text-blue-400 uppercase tracking-tighter">{participantsCount} TABLAS</span>
+                </div>
+              </div>
+
+              <div 
+                className="flex flex-col items-center gap-0.5 text-blue-600 cursor-pointer min-w-[60px] py-1 active:scale-95 transition-transform relative" 
+                onClick={() => { setIsChatOpen(!isChatOpen); hapticFeedback.selection(); }}
+              >
+                <MessageSquare className={`w-4 h-4 ${isChatOpen ? 'fill-current' : ''}`} />
+                <span className="text-[7px] font-black uppercase italic tracking-tighter">{isChatOpen ? 'Cerrar' : 'Chat'}</span>
+                {!isChatOpen && unreadChatCount > 0 && (
+                  <span className="absolute -top-1 right-2 bg-red-600 text-white text-[8px] font-black w-4 h-4 flex items-center justify-center rounded-full animate-pulse border-2 border-white">
+                    {unreadChatCount > 9 ? '9+' : unreadChatCount}
+                  </span>
+                )}
+              </div>
+
+              <div 
+                className="flex flex-col items-center gap-0.5 text-blue-600 cursor-pointer min-w-[60px] py-1 active:scale-90 transition-transform" 
+                onClick={() => setShowRanking(true)}
+              >
+                <Trophy className="w-4 h-4" />
+                <span className="text-[7px] font-black uppercase italic tracking-tighter">Ranking</span>
+              </div>
+            </nav>
           </>
         )}
       </div>

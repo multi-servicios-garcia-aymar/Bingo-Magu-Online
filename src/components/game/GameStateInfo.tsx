@@ -45,34 +45,34 @@ export default function GameStateInfo({ game, timeLeft, winningPattern }: GameSt
     : '';
 
   return (
-    <div className="flex flex-col mb-0 shrink-0 overflow-hidden rounded-b-xl border-x border-b border-slate-100 shadow-lg mx-0">
+    <div className="flex flex-col mb-0.5 shrink-0 overflow-hidden rounded-b-xl border-x border-b border-slate-100 shadow-md mx-0">
       {/* Top Main Status Bar */}
-      <div className="grid grid-cols-3 items-center bg-white/95 backdrop-blur-md px-2 py-2 relative z-10">
+      <div className="grid grid-cols-3 items-center bg-white/95 backdrop-blur-md px-2 py-1.5 relative z-10">
         {/* Left: Next Ball */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <div className="relative">
-            <div className={`w-20 h-20 rounded-full flex items-center justify-center text-white text-4xl font-black italic border-4 border-white shadow-2xl transition-all duration-500 ${displayBall ? 'bg-blue-600' : 'bg-slate-100'}`}>
-              <span className="drop-shadow-[0_4px_8px_rgba(0,0,0,0.5)]">
+            <div className={`w-14 h-14 rounded-full flex items-center justify-center text-white text-3xl font-black italic border-2 border-white shadow-xl transition-all duration-500 ${displayBall ? 'bg-blue-600' : 'bg-slate-100'}`}>
+              <span className="drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
                 {displayBall || (isTimeToHide ? '...' : '--')}
               </span>
             </div>
             {game?.status === 'playing' && !game?.is_paused && timeLeft !== null && (
-              <div className={`absolute -top-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center text-[12px] font-black border-2 border-white shadow-xl ${timeLeft <= 5 ? 'bg-red-500 text-white animate-pulse' : 'bg-blue-600 text-white'}`}>
+              <div className={`absolute -top-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black border border-white shadow-lg ${timeLeft <= 5 ? 'bg-red-500 text-white animate-pulse' : 'bg-blue-600 text-white'}`}>
                 {timeLeft}
               </div>
             )}
           </div>
           {!isTimeToHide && displayBall && (
-            <div className="text-6xl font-black text-blue-600 italic tracking-tighter font-display drop-shadow-md leading-none">
+            <div className="text-4xl font-black text-blue-600 italic tracking-tighter font-display drop-shadow-md leading-none">
               {ballLetter}
             </div>
           )}
         </div>
 
         {/* Center: Objective (Minimal in Top Bar) */}
-        <div className="flex flex-col items-center justify-center text-center px-4">
-          <div className="text-[9px] font-black text-slate-400 uppercase italic tracking-widest leading-none mb-1.5 font-display">OBJETIVO</div>
-          <div className="text-[14px] font-black text-blue-800 uppercase tracking-tight leading-tight bg-blue-100/40 px-3 py-1.5 rounded-xl border border-blue-200/50 w-full truncate italic font-display shadow-sm">
+        <div className="flex flex-col items-center justify-center text-center px-2">
+          <div className="text-[7px] font-black text-slate-400 uppercase italic tracking-widest leading-none mb-1 font-display">OBJETIVO</div>
+          <div className="text-[11px] font-black text-blue-800 uppercase tracking-tight leading-tight bg-blue-100/30 px-2 py-1 rounded-lg border border-blue-200/30 w-full truncate italic font-display">
             {game ? winningPattern.name : 'Sin Partida'}
           </div>
         </div>

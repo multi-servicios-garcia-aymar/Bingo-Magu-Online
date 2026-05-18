@@ -26,12 +26,12 @@ export default function BingoBoard({ drawnNumbers, ballLimit }: BingoBoardProps)
 
   return (
     <div className="bg-white/60 backdrop-blur-sm rounded-lg p-1 shadow-sm border border-white/40 flex flex-col w-full relative">
-      <div className="flex items-center justify-between px-2 mb-1.5">
-        <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5 italic">
+      <div className="flex items-center justify-between px-2 py-0.5">
+        <h3 className="text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1 italic">
           <div className="w-1 h-1 bg-blue-500 rounded-full animate-pulse shadow-[0_0_5px_rgba(59,130,246,0.5)]"></div>
           Bolas ({ballLimit})
         </h3>
-        <span className="text-[9px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">
+        <span className="text-[8px] font-black text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded-full border border-blue-100">
           {drawnNumbers.length}/{ballLimit}
         </span>
       </div>
