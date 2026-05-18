@@ -469,7 +469,7 @@ export default function App() {
               </div>
             )}
 
-            <main className="flex-1 overflow-hidden flex flex-col lg:flex-row p-1 lg:gap-4 relative">
+            <main className="flex-1 overflow-hidden flex flex-col lg:flex-row p-0.5 lg:gap-2 relative">
               {loading ? (
                 <div className="flex-1 flex items-center justify-center">
                   <div className="flex flex-col items-center gap-3">
@@ -494,7 +494,7 @@ export default function App() {
                   </AnimatePresence>
 
                   {/* Left Column (Board) */}
-                  <div className="shrink-0 lg:w-[45%] flex flex-col space-y-0.5">
+                  <div className="shrink-0 lg:w-[45%] flex flex-col space-y-0.1">
                     <div className="shrink-0">
                       <GameStateInfo 
                         game={game as any} 
@@ -509,56 +509,56 @@ export default function App() {
                            onClick={() => setShowAuthModal(true)}
                            className="absolute inset-0 bg-blue-600/5 backdrop-blur-[1px] z-10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
                          >
-                           <div className="bg-white/90 px-3 py-1.5 rounded-full shadow-lg border border-blue-100 flex items-center gap-2">
-                             <Play className="w-3 h-3 text-blue-600 fill-current" />
-                             <span className="text-[10px] font-black uppercase italic text-blue-700">Iniciar Sesión para Jugar</span>
+                           <div className="bg-white/90 px-2 py-1 rounded-full shadow-lg border border-blue-100 flex items-center gap-1">
+                             <Play className="w-2.5 h-2.5 text-blue-600 fill-current" />
+                             <span className="text-[8px] font-black uppercase italic text-blue-700">Entrar</span>
                            </div>
                          </div>
                        )}
                        <BingoBoard drawnNumbers={game?.drawn_numbers || []} ballLimit={game?.ball_limit || 75} />
-                       <div className="h-4 overflow-hidden mt-0.5">
+                       <div className="h-3 overflow-hidden mt-0.1">
                          <HistoryRail drawnNumbers={game?.drawn_numbers || []} />
                        </div>
                     </div>
                   </div>
 
                   {/* Right Column (Cards) */}
-                  <div className="flex-1 flex flex-col min-h-0 relative overflow-y-auto lg:pr-1 custom-scrollbar">
+                  <div className="flex-1 flex flex-col min-h-0 relative overflow-hidden lg:pr-1">
                     {userCards.length > 0 ? (
                        <>
-                         <div className="flex items-center justify-between px-2 py-1 glass rounded-lg mx-0.5 shadow-sm shrink-0 mb-1 lg:sticky lg:top-0 lg:z-10">
+                         <div className="flex items-center justify-between px-2 py-0.5 glass rounded-lg mx-0.5 shadow-sm shrink-0 mb-0.5 lg:sticky lg:top-0 lg:z-10">
                             <button 
                               onClick={() => { setCurrentCardIndex(prev => Math.max(0, prev - 1)); hapticFeedback.selection(); }}
                               disabled={currentCardIndex === 0}
-                              className="p-1 rounded-lg bg-white shadow-sm border border-slate-100 disabled:opacity-20 text-blue-600 active:scale-95 transition-all">
-                              <ChevronLeft className="w-4 h-4" />
+                              className="p-0.5 rounded-lg bg-white shadow-sm border border-slate-100 disabled:opacity-20 text-blue-600 active:scale-95 transition-all">
+                              <ChevronLeft className="w-3 h-3" />
                             </button>
                             
                             <div className="flex flex-col items-center">
-                              <span className="text-[6px] font-black text-slate-400 uppercase italic tracking-widest leading-none">TABLA</span>
-                              <div className="flex items-center gap-1.5">
-                                <div className="text-xs font-black text-blue-700 italic font-display">#{currentCardIndex + 1}</div>
-                                <div className="h-2 w-px bg-slate-200"></div>
-                                <div className="text-[8px] font-bold text-slate-400 uppercase">{userCards.length} TOTAL</div>
+                              <span className="text-[5px] font-black text-slate-400 uppercase italic tracking-widest leading-none">TABLA</span>
+                              <div className="flex items-center gap-1">
+                                <div className="text-[9px] font-black text-blue-700 italic font-display">#{currentCardIndex + 1}</div>
+                                <div className="h-1.5 w-px bg-slate-200"></div>
+                                <div className="text-[7px] font-bold text-slate-400 uppercase">{userCards.length} TOTAL</div>
                               </div>
                             </div>
 
                             <button 
                               onClick={() => { setCurrentCardIndex(prev => Math.min(userCards.length - 1, prev + 1)); hapticFeedback.selection(); }}
                               disabled={currentCardIndex === userCards.length - 1}
-                              className="p-1 rounded-lg bg-white shadow-sm border border-slate-100 disabled:opacity-20 text-blue-600 active:scale-95 transition-all">
-                              <ChevronRight className="w-4 h-4" />
+                              className="p-0.5 rounded-lg bg-white shadow-sm border border-slate-100 disabled:opacity-20 text-blue-600 active:scale-95 transition-all">
+                              <ChevronRight className="w-3 h-3" />
                             </button>
                          </div>
 
-                         <div className="flex-none flex items-center justify-center p-1 mb-1">
+                         <div className="flex-1 flex items-center justify-center p-0.5 overflow-hidden">
                            <AnimatePresence mode="wait">
                              <motion.div
                                 key={userCards[currentCardIndex].id}
-                                initial={{ opacity: 0, scale: 0.9 }}
+                                initial={{ opacity: 0, scale: 0.95 }}
                                 animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0, scale: 0.9 }}
-                                className="w-full flex items-center justify-center py-1"
+                                exit={{ opacity: 0, scale: 0.95 }}
+                                className="w-full h-full flex items-center justify-center"
                              >
                                <BingoCard 
                                   card={userCards[currentCardIndex].card_data}
@@ -608,7 +608,7 @@ export default function App() {
                          )}
                        </>
                      ) : (
-                       <div className="flex-1 flex flex-col items-center justify-center py-2 space-y-4">
+                       <div className="flex-1 flex flex-col items-center justify-center py-1 space-y-2">
                          <div 
                            onClick={() => {
                              if (!user) {
@@ -616,39 +616,39 @@ export default function App() {
                                setShowAuthModal(true);
                              }
                            }}
-                           className={`text-center space-y-3 ${!user ? 'cursor-pointer hover:bg-slate-50/50 p-2 rounded-2xl transition-all active:scale-95' : ''}`}
+                           className={`text-center space-y-2 ${!user ? 'cursor-pointer hover:bg-slate-50/50 p-1.5 rounded-2xl transition-all active:scale-95' : ''}`}
                          >
                            <div className="relative inline-block">
-                             <div className="w-16 h-16 bg-blue-50/50 text-blue-200 rounded-3xl flex items-center justify-center mx-auto shadow-inner border border-blue-100/50">
-                               <Users className="w-8 h-8" />
+                             <div className="w-12 h-12 bg-blue-50/50 text-blue-200 rounded-2xl flex items-center justify-center mx-auto shadow-inner border border-blue-100/50">
+                               <Users className="w-6 h-6" />
                              </div>
                              {!user && (
-                               <div className="absolute -top-1 -right-1 bg-blue-600 text-white p-1 rounded-full shadow-lg border-2 border-white animate-bounce">
-                                 <Play className="w-3 h-3 fill-current" />
+                               <div className="absolute -top-1 -right-1 bg-blue-600 text-white p-0.5 rounded-full shadow-lg border-2 border-white animate-bounce">
+                                 <Play className="w-2.5 h-2.5 fill-current" />
                                </div>
                              )}
                            </div>
-                           <div className="space-y-1">
-                             <h3 className="font-black text-slate-800 uppercase italic leading-none font-display text-base">
+                           <div className="space-y-0.5">
+                             <h3 className="font-black text-slate-800 uppercase italic leading-none font-display text-sm">
                                {user ? 'Genera tus Tablas' : 'Inicia Sesión'}
                              </h3>
-                             <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider max-w-[200px] mx-auto">
-                               {user ? 'Selecciona cuántas tablas quieres para participar' : 'Para participar en la partida y gritar BINGO'}
+                             <p className="text-[8px] text-slate-400 font-bold uppercase tracking-wider max-w-[180px] mx-auto">
+                               {user ? 'Selecciona cuántas tablas' : 'Para participar en la partida'}
                              </p>
                            </div>
                          </div>
 
                           <div className="w-full px-4">
-                            <div className="glass rounded-[2rem] p-4 space-y-4 shadow-xl border border-white">
+                            <div className="glass rounded-[1.5rem] p-2.5 space-y-2.5 shadow-xl border border-white">
                               {user && (
                                 <div className="flex items-center justify-between">
-                                  <span className="text-[9px] font-black text-slate-500 uppercase italic">Cant. Tablas</span>
-                                  <div className="flex items-center gap-2">
+                                  <span className="text-[8px] font-black text-slate-500 uppercase italic">Cant. Tablas</span>
+                                  <div className="flex items-center gap-1.5">
                                      {[1, 2, 3, 4, 5].map(num => (
                                        <button
                                          key={num}
                                          onClick={() => { setCardCount(num); hapticFeedback.selection(); }}
-                                         className={`w-9 h-9 rounded-xl font-black text-sm transition-all border-2 ${cardCount === num ? 'bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-200' : 'bg-white text-slate-600 border-slate-100 hover:bg-slate-50'}`}
+                                         className={`w-8 h-8 rounded-lg font-black text-xs transition-all border-2 ${cardCount === num ? 'bg-blue-600 text-white border-blue-600 shadow-md shadow-blue-200' : 'bg-white text-slate-600 border-slate-100 hover:bg-slate-50'}`}
                                        >
                                          {num}
                                        </button>
@@ -660,12 +660,12 @@ export default function App() {
                               <button 
                                  onClick={user ? handleJoin : () => { hapticFeedback.impact('light'); setShowAuthModal(true); }}
                                  disabled={(game && game.status !== 'waiting') || isLoggingIn}
-                                 className={`w-full py-4 shadow-lg active:scale-95 transition-all text-white rounded-2xl font-black uppercase italic text-xs flex items-center justify-center gap-2 disabled:opacity-50 ${gameMode === 'global' ? 'bg-blue-600 shadow-blue-200' : 'bg-indigo-600 shadow-indigo-200'}`}
+                                 className={`w-full py-2.5 shadow-lg active:scale-95 transition-all text-white rounded-xl font-black uppercase italic text-[10px] flex items-center justify-center gap-2 disabled:opacity-50 ${gameMode === 'global' ? 'bg-blue-600 shadow-blue-200' : 'bg-indigo-600 shadow-indigo-200'}`}
                                >
-                                 {isLoggingIn ? <Loader2 className="w-5 h-5 animate-spin" /> : (
-                                   user ? <Grid3X3 className="w-5 h-5" /> : <Play className="w-5 h-5 fill-current" />
+                                 {isLoggingIn ? <Loader2 className="w-4 h-4 animate-spin" /> : (
+                                   user ? <Grid3X3 className="w-4 h-4" /> : <Play className="w-4 h-4 fill-current" />
                                  )}
-                                 {!user ? 'Iniciar Sesión para Jugar' : `Generar ${cardCount} ${cardCount === 1 ? 'Tabla' : 'Tablas'}`}
+                                 {!user ? 'Iniciar Sesión' : `Generar ${cardCount} ${cardCount === 1 ? 'Tabla' : 'Tablas'}`}
                                </button>
                             </div>
                           </div>
@@ -686,7 +686,7 @@ export default function App() {
 
             <nav 
               className="bg-white border-t border-slate-200 flex items-center justify-around py-0.5 flex-shrink-0 shadow-sm"
-              style={{ paddingBottom: 'calc(4rem + env(safe-area-inset-bottom))' }}
+              style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
             >
               <div className="flex flex-col items-center gap-0 text-blue-600 cursor-pointer min-w-[60px] py-1 active:scale-95 transition-transform" onClick={() => setView('lobby')}>
                 <Users className="w-4 h-4" />

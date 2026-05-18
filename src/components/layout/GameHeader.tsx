@@ -56,7 +56,7 @@ export default function GameHeader({
   return (
     <header 
       className="bg-white border-b border-slate-200 px-3 py-1 flex justify-between items-center shadow-sm flex-shrink-0"
-      style={{ paddingTop: 'calc(5.5rem + env(safe-area-inset-top))' }}
+      style={{ paddingTop: 'env(safe-area-inset-top)' }}
     >
       <div className="flex items-center space-x-1.5">
         {canUseSuperFeatures && (

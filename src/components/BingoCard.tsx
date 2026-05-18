@@ -62,46 +62,19 @@ export default function BingoCard({
   const isDrawn = (val: number) => val === 0 || drawnNumbers.includes(val);
   
   return (
-    <div className="flex flex-col items-center space-y-0.5 w-full max-w-[320px] sm:max-w-md mx-auto py-1 px-1 justify-center relative">
-      <div className={`bg-white p-1.5 sm:p-4 rounded-[1.2rem] sm:rounded-[2.5rem] shadow-2xl border border-slate-100 w-full relative transition-all duration-700 shrink-0 ${isWinner ? 'winner-glow scale-105 ring-4 ring-green-400/30' : ''}`}>
+    <div className="flex flex-col items-center space-y-0.1 w-full max-w-[320px] sm:max-w-md mx-auto py-0.5 px-1 justify-center relative">
+      <div className={`bg-white p-1 rounded-[1rem] sm:p-4 sm:rounded-[2.5rem] shadow-2xl border border-slate-100 w-full relative transition-all duration-700 shrink-0 ${isWinner ? 'winner-glow scale-105 ring-4 ring-green-400/30' : ''}`}>
         
-        {/* Destello / Flash Effect */}
-        <AnimatePresence>
-          {isWinner && (
-            <>
-              <motion.div
-                initial={{ opacity: 0, rotate: -45, x: '-100%' }}
-                animate={{ x: '200%' }}
-                transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 1 }}
-                className="absolute inset-0 z-10 pointer-events-none bg-gradient-to-r from-transparent via-white/40 to-transparent w-full"
-              />
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: [0, 1, 0] }}
-                transition={{ duration: 2, repeat: Infinity }}
-                className="absolute inset-0 z-0 pointer-events-none bg-green-500/5 rounded-inherit"
-              />
-              {/* Corner Sparkles */}
-              <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute -top-1 -right-1 z-20 text-yellow-400">
-                <Sparkles className="w-6 h-6 fill-current" />
-              </motion.div>
-              <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.2 }} className="absolute -bottom-1 -left-1 z-20 text-yellow-400">
-                <Sparkles className="w-5 h-5 fill-current" />
-              </motion.div>
-            </>
-          )}
-        </AnimatePresence>
-        
-        <div className="grid grid-cols-5 gap-1 sm:gap-2.5 mb-1 sm:mb-2 md:mb-3">
+        {/* Numbers Grid - Perfect Square */}
+        <div className="grid grid-cols-5 gap-1 mb-1 sm:mb-2 italic">
           {['B', 'I', 'N', 'G', 'O'].map((letter) => (
-            <div key={letter} className="text-center font-black text-xs sm:text-2xl md:text-3xl text-blue-600 italic font-display flex items-center justify-center">
+            <div key={letter} className="text-center font-black text-xs sm:text-2xl text-blue-600 flex items-center justify-center">
               {letter}
             </div>
           ))}
         </div>
 
-        {/* Numbers Grid - Perfect Square */}
-        <div className="grid grid-cols-5 gap-0.5 sm:gap-2.5 aspect-square">
+        <div className="grid grid-cols-5 gap-0.5 sm:gap-2 aspect-square">
           {card.map((row, rowIndex) => {
             return row.map((cell, colIndex) => {
               const key = `${rowIndex}-${colIndex}`;
@@ -116,7 +89,7 @@ export default function BingoCard({
                   whileTap={{ scale: 0.85 }}
                   onClick={() => toggleMark(rowIndex, colIndex, cell)}
                   className={`
-                    relative flex items-center justify-center rounded-md sm:rounded-xl text-[14px] sm:text-[33px] font-black aspect-square transition-colors duration-300
+                    relative flex items-center justify-center rounded-sm sm:rounded-xl text-[12px] sm:text-[30px] font-black aspect-square transition-colors duration-300
                     ${isFree ? 'bg-blue-50 text-blue-600 border border-blue-100 shadow-inner' : 
                       isActuallyMarked 
                         ? (isWinner && isPattern 
@@ -130,14 +103,10 @@ export default function BingoCard({
                     ${isActuallyMarked ? 'scale-90' : ''}
                   `}
                 >
-                  {isFree ? <Star className="w-3 sm:w-10 h-3 sm:h-10 fill-current animate-pulse opacity-80" /> : <span className="drop-shadow-sm italic">{cell}</span>}
+                  {isFree ? <Star className="w-2.5 sm:w-10 h-2.5 sm:h-10 fill-current animate-pulse opacity-80" /> : <span className="drop-shadow-sm italic">{cell}</span>}
                   
                   {isActuallyMarked && isCorrect && !isFree && (
-                    <Check className="absolute top-0.5 right-0.5 w-2 h-2 sm:w-4 sm:h-4 opacity-80 text-white" />
-                  )}
-                  
-                  {isPattern && !isActuallyMarked && !isFree && (
-                    <div className="absolute inset-0 bg-blue-500/5 rounded-md sm:rounded-xl border border-blue-500/20 pointer-events-none" />
+                    <Check className="absolute top-0.5 right-0.5 w-1.5 h-1.5 sm:w-4 sm:h-4 opacity-80 text-white" />
                   )}
                 </motion.button>
               );
@@ -146,7 +115,7 @@ export default function BingoCard({
         </div>
       </div>
 
-      <div className="w-full flex flex-col gap-0.5 sm:gap-2 shrink-0 min-h-[36px] sm:min-h-[60px] justify-center">
+      <div className="w-full flex flex-col gap-0.1 sm:gap-2 shrink-0 min-h-[30px] sm:min-h-[60px] justify-center mt-0.5">
         <AnimatePresence mode="wait">
           {isWinner ? (
             <motion.div 
@@ -154,9 +123,9 @@ export default function BingoCard({
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
-              className="bg-green-600 text-white py-1 rounded-xl text-center font-black w-full text-[10px] flex items-center justify-center gap-2 shadow-lg border border-white/30 italic uppercase"
+              className="bg-green-600 text-white py-0.5 rounded-lg text-center font-black w-full text-[9px] flex items-center justify-center gap-1.5 shadow-lg border border-white/30 italic uppercase"
             >
-              <Sparkles className="w-3 h-3 animate-pulse" />
+              <Sparkles className="w-2.5 h-2.5 animate-pulse" />
               ¡GANASTE BINGO!
             </motion.div>
           ) : (
@@ -169,17 +138,17 @@ export default function BingoCard({
               whileTap={gameFinished ? {} : { scale: 0.95 }}
               disabled={gameFinished}
               onClick={() => onBingo(Object.keys(localMarked).filter(k => localMarked[k]))}
-              className={`w-full h-8 sm:h-12 font-black text-[10px] sm:text-xl rounded-lg sm:rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 uppercase tracking-tight italic border border-white/20 ${gameFinished ? 'bg-slate-300 text-slate-500 cursor-not-allowed shadow-none' : 'bg-blue-600 hover:bg-blue-700 text-white'}`}
+              className={`w-full h-7 sm:h-12 font-black text-[9px] sm:text-xl rounded-lg sm:rounded-2xl shadow-lg transition-all flex items-center justify-center gap-1 uppercase tracking-tight italic border border-white/20 ${gameFinished ? 'bg-slate-300 text-slate-500 cursor-not-allowed shadow-none' : 'bg-blue-600 hover:bg-blue-700 text-white'}`}
             >
-              <Trophy className="w-3 sm:w-6 h-3 sm:h-6" />
+              <Trophy className="w-2.5 sm:w-6 h-2.5 sm:h-6" />
               <span>¡BINGO!</span>
-              <span className="text-[6px] font-bold opacity-60 tracking-normal ml-2">VERIFICAR</span>
+              <span className="text-[5px] font-bold opacity-60 tracking-normal ml-1">VERIFICAR</span>
             </motion.button>
           )}
         </AnimatePresence>
 
-        <div className="text-[7px] font-black text-slate-300 uppercase tracking-[0.2em] italic text-center leading-none">
-          CANTAR BINGO VERIFICA SEGÚN {winningPatternName}
+        <div className="text-[6px] font-black text-slate-300 uppercase tracking-[0.2em] italic text-center leading-none mt-0.5">
+          VERIFICA SEGÚN {winningPatternName}
         </div>
       </div>
     </div>
