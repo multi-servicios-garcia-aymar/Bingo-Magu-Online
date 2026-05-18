@@ -47,65 +47,65 @@ export default function GameStateInfo({ game, timeLeft, winningPattern }: GameSt
   return (
     <div className="flex flex-col mb-1 shrink-0 overflow-hidden rounded-xl border border-slate-100 shadow-lg mx-1">
       {/* Top Main Status Bar */}
-      <div className="grid grid-cols-3 items-center bg-white/95 backdrop-blur-md px-2 py-0 relative z-10">
+      <div className="grid grid-cols-3 items-center bg-white/95 backdrop-blur-md px-2 py-2 relative z-10">
         {/* Left: Next Ball */}
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-4">
           <div className="relative">
-            <div className={`w-7 h-7 rounded-full flex items-center justify-center text-white text-base font-black italic border-2 border-white shadow-xl transition-all duration-500 ${displayBall ? 'bg-blue-600' : 'bg-slate-100'}`}>
-              <span className="drop-shadow-[0_1px_1px_rgba(0,0,0,0.3)]">
+            <div className={`w-20 h-20 rounded-full flex items-center justify-center text-white text-4xl font-black italic border-4 border-white shadow-2xl transition-all duration-500 ${displayBall ? 'bg-blue-600' : 'bg-slate-100'}`}>
+              <span className="drop-shadow-[0_4px_8px_rgba(0,0,0,0.5)]">
                 {displayBall || (isTimeToHide ? '...' : '--')}
               </span>
             </div>
             {game?.status === 'playing' && !game?.is_paused && timeLeft !== null && (
-              <div className={`absolute -top-1 -right-1 w-3 h-3 rounded-full flex items-center justify-center text-[6px] font-black border-2 border-white shadow-md ${timeLeft <= 5 ? 'bg-red-500 text-white animate-pulse' : 'bg-blue-600 text-white'}`}>
+              <div className={`absolute -top-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center text-[12px] font-black border-2 border-white shadow-xl ${timeLeft <= 5 ? 'bg-red-500 text-white animate-pulse' : 'bg-blue-600 text-white'}`}>
                 {timeLeft}
               </div>
             )}
           </div>
           {!isTimeToHide && displayBall && (
-            <div className="text-xl font-black text-blue-600 italic tracking-tighter font-display drop-shadow-sm leading-none">
+            <div className="text-6xl font-black text-blue-600 italic tracking-tighter font-display drop-shadow-md leading-none">
               {ballLetter}
             </div>
           )}
         </div>
 
         {/* Center: Objective (Minimal in Top Bar) */}
-        <div className="flex flex-col items-center justify-center text-center px-1">
-          <div className="text-[4px] font-black text-slate-400 uppercase italic tracking-widest leading-none mb-0.5">OBJETIVO</div>
-          <div className="text-[7px] font-black text-blue-800 uppercase tracking-tight leading-tight bg-blue-100/30 px-1 py-0.2 rounded border border-blue-200/30 w-full truncate italic font-display">
+        <div className="flex flex-col items-center justify-center text-center px-4">
+          <div className="text-[9px] font-black text-slate-400 uppercase italic tracking-widest leading-none mb-1.5 font-display">OBJETIVO</div>
+          <div className="text-[14px] font-black text-blue-800 uppercase tracking-tight leading-tight bg-blue-100/40 px-3 py-1.5 rounded-xl border border-blue-200/50 w-full truncate italic font-display shadow-sm">
             {game ? winningPattern.name : 'Sin Partida'}
           </div>
         </div>
 
         {/* Right: Status */}
-        <div className="flex justify-end items-center gap-1">
+        <div className="flex justify-end items-center gap-2">
           {!game ? (
-            <div className="flex items-center gap-1 bg-slate-50 text-slate-400 px-1 py-0.2 rounded-full border border-slate-100 italic scale-75">
-              <span className="text-[5px] font-black uppercase italic">Desconectado</span>
+            <div className="flex items-center gap-1.5 bg-slate-50 text-slate-400 px-2 py-1 rounded-full border border-slate-100 italic">
+              <span className="text-[8px] font-black uppercase italic">Desconectado</span>
             </div>
           ) : game.status === 'waiting' ? (
-            <div className="flex items-center gap-1 bg-blue-50 text-blue-600 px-1 py-0.2 rounded-full border border-blue-100 animate-pulse min-w-[50px] justify-center scale-75">
-              <span className="text-[5px] font-black uppercase italic whitespace-nowrap">Esperando Admin</span>
+            <div className="flex items-center gap-1.5 bg-blue-50 text-blue-600 px-2 py-1 rounded-full border border-blue-100 animate-pulse min-w-[80px] justify-center">
+              <span className="text-[8px] font-black uppercase italic whitespace-nowrap">Esperando Admin</span>
             </div>
           ) : game.is_paused ? (
-            <div className="flex items-center gap-1 bg-amber-50 text-amber-600 px-1 py-0.2 rounded-full border border-amber-100 scale-75">
-              <Pause className="w-1.5 h-1.5 fill-current" />
-              <span className="text-[5px] font-black uppercase italic">Pausa</span>
+            <div className="flex items-center gap-1.5 bg-amber-50 text-amber-600 px-2 py-1 rounded-full border border-amber-100">
+              <Pause className="w-3 h-3 fill-current" />
+              <span className="text-[9px] font-black uppercase italic">Pausa</span>
             </div>
           ) : game.status === 'finished' ? (
-            <div className="flex flex-col items-end scale-75 origin-right">
-               <div className="flex items-center gap-1 bg-slate-100 px-1 py-0.2 rounded-full border border-slate-200">
-                  <div className="w-0.5 h-0.5 bg-slate-400 rounded-full"></div>
-                  <div className="text-[5px] font-black text-slate-500 uppercase tracking-wider italic">Finalizado</div>
+            <div className="flex flex-col items-end">
+               <div className="flex items-center gap-1.5 bg-slate-100 px-2 py-1 rounded-full border border-slate-200">
+                  <div className="w-1.5 h-1.5 bg-slate-400 rounded-full"></div>
+                  <div className="text-[8px] font-black text-slate-500 uppercase tracking-wider italic">Finalizado</div>
                </div>
             </div>
           ) : (
-            <div className="flex flex-col items-end scale-75 origin-right">
-               <div className="flex items-center gap-1 bg-green-50 px-1 py-0.2 rounded-full border border-green-100">
-                  <div className="w-0.5 h-0.5 bg-green-500 rounded-full animate-ping"></div>
-                  <div className="text-[5px] font-black text-green-600 uppercase tracking-wider italic">En Vivo</div>
+            <div className="flex flex-col items-end">
+               <div className="flex items-center gap-1.5 bg-green-50 px-2 py-1 rounded-full border border-green-100">
+                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-ping"></div>
+                  <div className="text-[8px] font-black text-green-600 uppercase tracking-wider italic">En Vivo</div>
                </div>
-               <div className="text-[5px] text-slate-400 font-bold mt-0.2 uppercase">{(game?.drawn_numbers || []).length} Bolas</div>
+               <div className="text-[8px] text-slate-400 font-bold mt-1 uppercase">{(game?.drawn_numbers || []).length} Bolas Jugadas</div>
             </div>
           )}
         </div>

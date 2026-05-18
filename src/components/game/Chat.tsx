@@ -9,6 +9,9 @@ interface ChatProps {
   gameId: string;
   userId: string;
   userName: string;
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+  onUnreadChange?: (count: number) => void;
 }
 
 const QUICK_EMOJIS = ['👍', '❤️', '🔥', '😂', '😮', '👏', '🎱', '🍀'];
@@ -30,9 +33,8 @@ const getUserColor = (userId: string) => {
   return colors[Math.abs(hash) % colors.length];
 };
 
-export default function Chat({ gameId, userId, userName }: ChatProps) {
+export default function Chat({ gameId, userId, userName, isOpen, onOpenChange, onUnreadChange }: ChatProps) {
   const { messages, sendMessage } = useChat(gameId);
-  const [isOpen, setIsOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [showEmojis, setShowEmojis] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -49,9 +51,12 @@ export default function Chat({ gameId, userId, userName }: ChatProps) {
 
   useEffect(() => {
     if (!isOpen && messages.length > 0) {
-      setUnreadCount(prev => prev + 1);
+      const newCount = unreadCount + 1;
+      setUnreadCount(newCount);
+      onUnreadChange?.(newCount);
     } else if (isOpen) {
       setUnreadCount(0);
+      onUnreadChange?.(0);
     }
   }, [messages.length, isOpen]);
 
@@ -119,14 +124,14 @@ export default function Chat({ gameId, userId, userName }: ChatProps) {
   };
 
   return (
-    <div className="fixed bottom-20 right-4 z-[100]">
+    <div className="fixed bottom-14 right-4 z-[100] pointer-events-none">
       <AnimatePresence>
         {isOpen && (
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="bg-white rounded-2xl shadow-2xl border border-slate-100 w-72 sm:w-80 h-96 flex flex-col mb-4 overflow-hidden"
+            className="bg-white rounded-2xl shadow-2xl border border-slate-100 w-72 sm:w-80 h-96 flex flex-col mb-4 overflow-hidden pointer-events-auto"
           >
             {/* Header */}
             <div className="bg-slate-900 p-3 flex items-center justify-between text-white shrink-0">
@@ -137,7 +142,7 @@ export default function Chat({ gameId, userId, userName }: ChatProps) {
                 <h3 className="text-[10px] font-black uppercase italic tracking-tighter">Chat en vivo</h3>
               </div>
               <button 
-                onClick={() => setIsOpen(false)}
+                onClick={() => onOpenChange(false)}
                 className="p-1 hover:bg-slate-800 rounded-lg transition-colors"
                 id="close-chat-btn"
               >
@@ -217,30 +222,6 @@ export default function Chat({ gameId, userId, userName }: ChatProps) {
           </motion.div>
         )}
       </AnimatePresence>
-
-      <motion.button
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        onClick={() => setIsOpen(!isOpen)}
-        className={`
-          flex items-center gap-2 px-4 py-3 rounded-2xl shadow-xl transition-all border relative
-          ${isOpen ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-blue-50 text-blue-600'}
-        `}
-        id="toggle-chat-btn"
-      >
-        <div className="relative">
-          <MessageSquare className="w-5 h-5" />
-          {!isOpen && unreadCount > 0 && (
-            <span className="absolute -top-2 -right-2 bg-red-600 text-white text-[10px] font-black w-4 h-4 flex items-center justify-center rounded-full animate-pulse border-2 border-white">
-              {unreadCount > 9 ? '9+' : unreadCount}
-            </span>
-          )}
-        </div>
-        <span className="text-xs font-black uppercase italic tracking-tighter">
-          {isOpen ? 'Cerrar Chat' : 'Chat en vivo'}
-        </span>
-        {isOpen ? <ChevronDown className="w-4 h-4 opacity-50" /> : <ChevronUp className="w-4 h-4 opacity-50" />}
-      </motion.button>
     </div>
   );
 }

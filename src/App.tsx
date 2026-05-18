@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { 
   Users, Play, RotateCcw, AlertCircle, Loader2, 
   Grid3X3, X, ChevronLeft, ChevronRight, Trophy, Settings2,
-  Maximize2
+  Maximize2, MessageSquare
 } from 'lucide-react';
 
 // Types
@@ -92,6 +92,8 @@ export default function App() {
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [isAppReady, setIsAppReady] = useState(false);
   const [showWelcomeSplash, setShowWelcomeSplash] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [unreadChatCount, setUnreadChatCount] = useState(0);
 
   const ADMIN_IDS = useMemo(() => import.meta.env.VITE_ADMIN_IDS?.split(',') || [], []);
   const IS_SUPABASE_CONFIGURED = import.meta.env.VITE_SUPABASE_URL?.includes('.supabase.co');
@@ -662,6 +664,9 @@ export default function App() {
                 gameId={game.id} 
                 userId={user.id} 
                 userName={user.name} 
+                isOpen={isChatOpen}
+                onOpenChange={setIsChatOpen}
+                onUnreadChange={setUnreadChatCount}
               />
             )}
 
@@ -683,6 +688,19 @@ export default function App() {
                   <span className="text-[7px] font-black text-blue-700 italic uppercase leading-none">{uniqueParticipantsCount} JUGADORES</span>
                   <span className="text-[5px] font-bold text-blue-400 uppercase tracking-tighter">{participantsCount} TABLAS</span>
                 </div>
+              </div>
+
+              <div 
+                className="flex flex-col items-center gap-0 text-blue-600 cursor-pointer min-w-[50px] py-0.5 active:scale-95 transition-transform relative" 
+                onClick={() => { setIsChatOpen(!isChatOpen); hapticFeedback.selection(); }}
+              >
+                <MessageSquare className={`w-3.5 h-3.5 ${isChatOpen ? 'fill-current' : ''}`} />
+                <span className="text-[6px] font-black uppercase italic tracking-tighter">{isChatOpen ? 'Cerrar' : 'Chat'}</span>
+                {!isChatOpen && unreadChatCount > 0 && (
+                  <span className="absolute -top-1 right-0 bg-red-600 text-white text-[7px] font-black w-3 h-3 flex items-center justify-center rounded-full animate-pulse border border-white">
+                    {unreadChatCount > 9 ? '9+' : unreadChatCount}
+                  </span>
+                )}
               </div>
 
               <div 
