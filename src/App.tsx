@@ -566,14 +566,14 @@ export default function App() {
                             </button>
                          </div>
 
-                         <div className="flex-1 flex items-center justify-center p-0 overflow-hidden">
+                         <div className="flex-1 flex flex-col items-center justify-start p-0 overflow-y-auto pt-1">
                            <AnimatePresence mode="wait">
                              <motion.div
                                  key={userCards[currentCardIndex].id}
                                  initial={{ opacity: 0, scale: 0.98 }}
                                  animate={{ opacity: 1, scale: 1 }}
                                  exit={{ opacity: 0, scale: 0.98 }}
-                                 className="w-full h-full flex items-center justify-center"
+                                 className="w-full h-fit flex items-center justify-center pb-4"
                               >
                                 <BingoCard 
                                    card={userCards[currentCardIndex].card_data}
