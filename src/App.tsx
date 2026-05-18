@@ -19,7 +19,7 @@ import { useParticipant } from './hooks/useParticipant';
 import { useBingoAuth } from './hooks/useBingoAuth';
 import { useAds } from './hooks/useAds';
 import { useNotifications } from './hooks/useNotifications';
-import { useChat } from './hooks/useChat';
+import { useChat, useChatSender } from './hooks/useChat';
 
 // Services
 import { GameService } from './services/gameService';
@@ -74,7 +74,7 @@ export default function App() {
   const { activePopupAd, setActivePopupAd, sidebarAds } = useAds(gameMode, game?.status, game?.drawn_numbers?.length || 0, true);
   
   const { isEnabled: isPushEnabled, subscribe: handleSubscribePush } = useNotifications(user?.id);
-  const { sendMessage } = useChat(game?.id);
+  const { sendMessage } = useChatSender(game?.id);
 
   const [isMuted, setIsMuted] = useState(false);
   const [isMicActive, setIsMicActive] = useState(false);
@@ -469,7 +469,7 @@ export default function App() {
               </div>
             )}
 
-            <main className="flex-1 overflow-y-auto flex flex-col lg:flex-row p-1 space-y-0.5 lg:space-y-0 lg:gap-4 relative custom-scrollbar">
+            <main className="flex-1 overflow-hidden flex flex-col lg:flex-row p-1 lg:gap-4 relative">
               {loading ? (
                 <div className="flex-1 flex items-center justify-center">
                   <div className="flex flex-col items-center gap-3">
@@ -523,7 +523,7 @@ export default function App() {
                   </div>
 
                   {/* Right Column (Cards) */}
-                  <div className="flex-1 flex flex-col min-h-0 relative lg:overflow-y-auto lg:pr-1 custom-scrollbar">
+                  <div className="flex-1 flex flex-col min-h-0 relative overflow-y-auto lg:pr-1 custom-scrollbar">
                     {userCards.length > 0 ? (
                        <>
                          <div className="flex items-center justify-between px-2 py-1 glass rounded-lg mx-0.5 shadow-sm shrink-0 mb-1 lg:sticky lg:top-0 lg:z-10">
@@ -674,6 +674,8 @@ export default function App() {
                   </div>
                 </>
               )}
+            </main>
+            
             {game?.id && user && (
               <Chat 
                 gameId={game.id} 
@@ -681,7 +683,6 @@ export default function App() {
                 userName={user.name} 
               />
             )}
-            </main>
 
             <nav 
               className="bg-white border-t border-slate-200 flex items-center justify-around py-0.5 flex-shrink-0 shadow-sm"

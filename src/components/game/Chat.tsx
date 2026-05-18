@@ -72,8 +72,13 @@ export default function Chat({ gameId, userId, userName }: ChatProps) {
     const isMe = msg.user_id === userId;
     const isSystem = msg.type === 'system';
     const isReaction = msg.type === 'reaction';
-    const date = new Date(msg.created_at);
-    const timeStr = format(date, 'HH:mm', { locale: es });
+    let timeStr = '';
+    try {
+      const date = new Date(msg.created_at || Date.now());
+      timeStr = !isNaN(date.getTime()) ? format(date, 'HH:mm', { locale: es }) : '';
+    } catch (e) {
+      timeStr = '';
+    }
 
     if (isSystem) {
       return (
@@ -114,14 +119,14 @@ export default function Chat({ gameId, userId, userName }: ChatProps) {
   };
 
   return (
-    <div className="fixed bottom-20 right-4 z-40">
+    <div className="fixed bottom-20 right-4 z-[100]">
       <AnimatePresence>
         {isOpen && (
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="bg-white rounded-2xl shadow-2xl border border-slate-100 w-72 sm:w-80 h-[450px] flex flex-col mb-4 overflow-hidden"
+            className="bg-white rounded-2xl shadow-2xl border border-slate-100 w-72 sm:w-80 h-96 flex flex-col mb-4 overflow-hidden"
           >
             {/* Header */}
             <div className="bg-slate-900 p-3 flex items-center justify-between text-white shrink-0">
