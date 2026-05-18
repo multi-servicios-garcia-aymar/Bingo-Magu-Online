@@ -45,7 +45,7 @@ export default function GameStateInfo({ game, timeLeft, winningPattern }: GameSt
     : '';
 
   return (
-    <div className="flex flex-col mb-1 shrink-0 overflow-hidden rounded-xl border border-slate-100 shadow-lg mx-1">
+    <div className="flex flex-col mb-0 shrink-0 overflow-hidden rounded-b-xl border-x border-b border-slate-100 shadow-lg mx-0">
       {/* Top Main Status Bar */}
       <div className="grid grid-cols-3 items-center bg-white/95 backdrop-blur-md px-2 py-2 relative z-10">
         {/* Left: Next Ball */}
